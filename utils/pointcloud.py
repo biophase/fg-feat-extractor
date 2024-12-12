@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 def voxel_hash (pcd_inds:torch.Tensor)->torch.Tensor:
     """Generates a 1D hash from a 3D voxel index array
@@ -71,3 +72,42 @@ def grid_subsample(pcd_points:torch.Tensor, voxel_size:float, pcd_feats:torch.Te
         bin_counts = bin_counts,
         inv_inds = inv_inds
     )
+
+def grid_subsample_simple(xyz:np.ndarray, voxel_size:float, device='cuda'):
+    """
+    Wrapper using numpy arrays
+    """
+    sub = grid_subsample(torch.Tensor(xyz).to(device=device), voxel_size) # n -> m number of points
+    sub['points'] = sub['points'].to(dtype=torch.float64).detach().cpu().numpy()
+    sub['inv_inds'] = sub['inv_inds'].detach().cpu().numpy()
+    return sub
+
+class BBox:
+    """Bounding box using the CloudCompare synthax
+    """
+    def __init__(self, orientation:np.ndarray, width: np.ndarray) -> None:
+        # an easy way to retrieve these values is by using the cross-section tool in cloudcompare
+        # so cross-section -> advanced -> orientation -> to clipboard
+        self.orientation = orientation
+        # from the same menu copy and paste the values under 'width' 
+        self.width = width
+        
+    def cutout(self, xyz:np.ndarray) -> np.ndarray:
+            # Inverse of the orientation matrix (rotation and translation)
+            orientation_inv = np.linalg.inv(self.orientation)
+            
+            # Transform points into the bbox's local coordinate system
+            transformed_xyz = (orientation_inv @ np.vstack((xyz.T, np.ones(xyz.shape[0])))).T
+            
+            # Get the half-dimensions of the bbox (since width is the full length)
+            half_width = self.width / 2
+            
+            # Check if points lie within the bbox in local coordinates
+            inside_bbox = (
+                (np.abs(transformed_xyz[:, 0]) <= half_width[0]) &
+                (np.abs(transformed_xyz[:, 1]) <= half_width[1]) &
+                (np.abs(transformed_xyz[:, 2]) <= half_width[2])
+            )
+            
+            # Return the indices of the points inside the bbox
+            return np.where(inside_bbox)[0]

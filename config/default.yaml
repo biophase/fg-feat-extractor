@@ -1,0 +1,66 @@
+general:
+  device: 'cuda'
+  batch_size : 128
+  weight_decay : 1e-4
+  max_epochs : 50
+data:
+  # dataset_root : "D:\Projekte\GIA_220412_PCS\02_Datasets\FullWaveForm\full_waveform_software\FullWaveformParse_mass\output\FWF_Aachen_labeled\" # work pc
+  dataset_root : "../../02_Datasets/FWF_Aachen_labeled/" # home pc
+  split: "./config/default_split.yaml"
+  preprocessing:
+    # Transforms
+    _transformsTraining_:
+      xyz:
+        TransZRotation : {}
+        TransScaling: {}
+        TransGaussianNoise : {mean: 0, std: 0.002}
+      rgb:
+        TransGaussianNoise : {mean: 0, std: 0.02}
+        TransFeatureDropout : {dropout_prob : 0.1}
+      wfm:
+        TransSignalScaling : {}
+      normals:
+        TransGaussianNoise : {mean: 0, std: 0.05}
+      incAngles:
+        TransGaussianNoise : {mean: 0, std: 0.05}
+        TransStandardize : {mean: 2.07, std: 0.38}
+      distanceFromScanner:
+        TransGaussianNoise: {mean: 12.13, std: 12.20}
+    _transformsValidation_:
+      xyz:
+        TransZRotation : {}
+        TransScaling: {}
+        TransGaussianNoise : {mean: 0, std: 0.002}
+      rgb:
+        TransGaussianNoise : {mean: 0, std: 0.02}
+        TransFeatureDropout : {dropout_prob : 0.1}
+      wfm:
+        TransSignalScaling : {}
+      normals:
+        TransGaussianNoise : {mean: 0, std: 0.05}
+      incAngles:
+        TransGaussianNoise : {mean: 0, std: 0.05}
+        TransStandardize : {mean: 2.07, std: 0.38}
+      distanceFromScanner:
+        TransGaussianNoise: {mean: 12.13, std: 12.20}
+  # Dataset
+  scalar_input_fields:
+    - 'xyz'
+    - 'rgb'
+    - 'riegl_feats'
+    - 'normals'
+    - 'incAngles'
+    - 'distanceFromScanner'
+  fw_input_field: True
+  label_names:
+    - 'labels_0'
+    # - 'labels_1'
+    # - 'labels_2'
+    # - 'labels_3'
+  query_grid_size: 0.15
+  subsample_on_gpu: True
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+
+
+
