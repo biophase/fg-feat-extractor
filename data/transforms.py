@@ -27,32 +27,36 @@ class Transform():
     #     return f"{self.__class__.__name__}({params_repr})"
 
 class TransZRotation(Transform):
+    
+    def fn(self, x):
+        r = np.random.uniform(*self.limits)
+        rot_matrix = np.array([[np.cos(r), -np.sin(r), 0],
+                                [np.sin(r),  np.cos(r), 0],
+                                [0,          0,         1]])
+        return x @ rot_matrix
+    
     def __init__(self, limits:Tuple = (0, 2*np.pi)):
-        def fn(x):
-            r = np.random.uniform(*limits)
-            rot_matrix = np.array([[np.cos(r), -np.sin(r), 0],
-                                   [np.sin(r),  np.cos(r), 0],
-                                   [0,          0,         1]])
-            return x @ rot_matrix
+        self.limits = limits
             
-        super().__init__(fn)
+        super().__init__(self.fn)
 
 class TransCenterXyz(Transform):
+    def fn(self, x:np.ndarray):
+        return x - x.mean(axis=0)
+
     def __init__(self):
-        def fn(x:np.ndarray):
-            return x - x.mean(axis=0)
-        
-        super().__init__(fn)
+        super().__init__(self.fn)
 
 class TransScaling(Transform):
+    def fn(self,x):
+        scale_factor = np.random.uniform(*self.limits)
+        scale_matrix = np.diag([scale_factor, scale_factor, scale_factor])  # Uniform scaling
+        return x @ scale_matrix
+    
     def __init__(self, limits: Tuple = (0.85, 1.15)):
         self.limits = limits
-        def fn(x):
-            scale_factor = np.random.uniform(*limits)
-            scale_matrix = np.diag([scale_factor, scale_factor, scale_factor])  # Uniform scaling
-            return x @ scale_matrix
         
-        super().__init__(fn)
+        super().__init__(self.fn)
 
 class TransGaussianNoise(Transform):
     def __init__(self, mean: float = 0.0, std: float = 0.01):
@@ -64,40 +68,43 @@ class TransGaussianNoise(Transform):
         super().__init__(fn)
 
 class TransGammaCorrection(Transform):
+    
+    def fn(self, x):
+        gamma = np.random.uniform(*self.limits)
+        return np.clip(x ** gamma, 0, 1) # TODO: Check order of normalization and augmentation !!!
+    
     def __init__(self, limits: Tuple[float, float] = (0.8, 1.2)):
         self.limits = limits
-        def fn(x):
-            gamma = np.random.uniform(*limits)
-            return np.clip(x ** gamma, 0, 1) # TODO: Check order of normalization and augmentation !!!
-        super().__init__(fn)
+        super().__init__(self.fn)
 
 class TransSignalScaling(Transform):
+    def fn(self, x:np.ndarray):
+        # waveform shape is neibors, 32
+        scale_factors = np.random.uniform(*self.limits, size=(x.shape[0],1))
+        return x * scale_factors
+    
     def __init__(self,limits:Tuple[float,float] = (0.95,1.05)):
         self.limits = limits
-        def fn(x:np.ndarray):
-            # waveform shape is neibors, 32
-            scale_factors = np.random.uniform(*limits, size=(x.shape[0],1))
-            return x * scale_factors
         
-        super().__init__(fn)
+        super().__init__(self.fn)
         
 class TransFeatureDropout(Transform):
+    def fn(self,x):
+        mask = np.random.binomial(1, 1 - self.dropout_prob, size=x.shape[1])
+        return x * mask  
     def __init__(self, dropout_prob: float = 0.2):
         self.dropout_prob = dropout_prob
-        def fn(x):
-            mask = np.random.binomial(1, 1 - dropout_prob, size=x.shape[1])
-            return x * mask  
         
-        super().__init__(fn)
+        super().__init__(self.fn)
 
 class TransStandardize(Transform):
+    def fn(self, x:np.ndarray):
+        x -= self.mean
+        x /= self.std
+        return x
     def __init__(self, mean, std):
         self.mean, self.std = mean, std
-        def fn(x:np.ndarray):
-            x -= mean
-            x /= std
-            return x
-        super().__init__(fn)
+        super().__init__(self.fn)
 
 class TransformsList():
     def __init__(self,
