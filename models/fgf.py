@@ -18,7 +18,7 @@ class FGFeatNetwork (nn.Module):
         super(FGFeatNetwork, self).__init__()
         
         self.label_structure = get_label_structure(cfg)
-        self.global_constraint = global_constraint
+        self.global_constraint = cfg.model.use_global_constraint
         # Pointwise feats
         self.mlp1 = nn.Sequential(
             nn.Linear(num_input_feats, 64), nn.ReLU(), nn.Dropout(p=dropout_prob),

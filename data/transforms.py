@@ -37,6 +37,12 @@ class TransZRotation(Transform):
             
         super().__init__(fn)
 
+class TransCenterXyz(Transform):
+    def __init__(self):
+        def fn(x:np.ndarray):
+            return x - x.mean(axis=0)
+        
+        super().__init__(fn)
 
 class TransScaling(Transform):
     def __init__(self, limits: Tuple = (0.85, 1.15)):

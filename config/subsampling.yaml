@@ -1,0 +1,6 @@
+data:
+  preprocess_raw:
+    raw_dir: /media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/02_Datasets/FWF_Aachen_labeled
+    preprocessed_dir:
+    voxel_size: 0.01
+    output_dir: ${data.preprocess_raw.raw_dir}/../FWF_Subsampled/${data.preprocess_raw.voxel_size}/

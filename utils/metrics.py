@@ -1,3 +1,4 @@
+from typing import List, Dict
 import torch
 from torch import nn
 import pandas as pd
@@ -65,59 +66,74 @@ def print_metrics(metrics, cfg, print_iou= False):
     print(metrics_df)
     
 def get_multilevel_metrics(epoch_predictions, epoch_labels, cfg):
+    with torch.no_grad():
+        metrics = {level:dict() for level in cfg.data.label_names}
+        for level in cfg.data.label_names:
+            num_classes_at_level = len(cfg.data.label_schema[level])
+
+            metrics[level]['overall']=dict()
+            metrics[level]['classwise']=dict()
+
+            y_pred = epoch_predictions[level]
+            y_true = epoch_labels[level]
+            k_at_level = torch.arange(num_classes_at_level)[None,:].to(cfg.general.device)
+            true_equals_k = k_at_level == y_true[:,None]
+            pred_equals_k = k_at_level == y_pred[:,None]
+
+            # initialize tensors to store the metrics
+            iou = torch.zeros((num_classes_at_level)).to(cfg.general.device)
+            precision = torch.zeros((num_classes_at_level)).to(cfg.general.device)
+            recall = torch.zeros((num_classes_at_level)).to(cfg.general.device)
+            f1_score = torch.zeros((num_classes_at_level)).to(cfg.general.device)
+            class_acc = torch.zeros((num_classes_at_level)).to(cfg.general.device)
+            
+            # calculate class-wise metrics
+            for k in range(num_classes_at_level):
+                tp = true_equals_k[:,k] & pred_equals_k[:,k]
+                fn = true_equals_k[:,k] & ~pred_equals_k[:,k]
+                fp = ~true_equals_k[:,k] & pred_equals_k[:,k]
+
+                iou[k] = tp.sum() / ((tp.sum() + fn.sum() + fp.sum()) + 1e-6)
+                precision[k] = tp.sum() / ((tp.sum() + fp.sum()) + 1e-6)
+                recall[k] = tp.sum() / ((tp.sum() + fn.sum()) + 1e-6)
+                f1_score[k] = 2 * precision[k] * recall[k] / ((precision[k] + recall[k]) + 1e-6)
+                class_acc[k] = tp.sum() / (true_equals_k[:,k].sum() + 1e-6)
+
+            # calculate overall metrics
+            overall_accuracy = torch.eq(y_pred, y_true).float().mean().item()
+            confusion_matrix = torch.zeros((num_classes_at_level, num_classes_at_level)).to(device=cfg.general.device)
+            
+            # calculate confusion matrix
+            true_labels = torch.argmax(true_equals_k.short(),dim=1)
+            pred_labels = torch.argmax(pred_equals_k.short(),dim=1)
+            values = torch.ones(len(true_labels)).to(device=cfg.general.device)
+            confusion_matrix.index_put_((true_labels,pred_labels), values, accumulate=True)
 
 
-    metrics = {level:dict() for level in cfg.data.label_names}
-    for level in cfg.data.label_names:
-        num_classes_at_level = len(cfg.data.label_schema[level])
+            # save values in a dictionary
+            metrics[level]['overall']['overall_accuracy'] = overall_accuracy
+            metrics[level]['overall']['confusion_matrix'] = confusion_matrix.detach().cpu().numpy()
 
-        metrics[level]['overall']=dict()
-        metrics[level]['classwise']=dict()
+            metrics[level]['classwise']['iou'] = iou.detach().cpu().numpy()
+            metrics[level]['classwise']['precision'] = precision.detach().cpu().numpy()
+            metrics[level]['classwise']['recall'] = recall.detach().cpu().numpy()
+            metrics[level]['classwise']['f1_score'] = f1_score.detach().cpu().numpy()
+            metrics[level]['classwise']['class_acc'] = class_acc.detach().cpu().numpy()
 
-        y_pred = epoch_predictions[level]
-        y_true = epoch_labels[level]
-        k_at_level = torch.arange(num_classes_at_level)[None,:].to(cfg.general.device)
-        true_equals_k = k_at_level == y_true[:,None]
-        pred_equals_k = k_at_level == y_pred[:,None]
-
-        # initialize tensors to store the metrics
-        iou = torch.zeros((num_classes_at_level)).to(cfg.general.device)
-        precision = torch.zeros((num_classes_at_level)).to(cfg.general.device)
-        recall = torch.zeros((num_classes_at_level)).to(cfg.general.device)
-        f1_score = torch.zeros((num_classes_at_level)).to(cfg.general.device)
-        class_acc = torch.zeros((num_classes_at_level)).to(cfg.general.device)
-        
-        # calculate class-wise metrics
-        for k in range(num_classes_at_level):
-            tp = true_equals_k[:,k] & pred_equals_k[:,k]
-            fn = true_equals_k[:,k] & ~pred_equals_k[:,k]
-            fp = ~true_equals_k[:,k] & pred_equals_k[:,k]
-
-            iou[k] = tp.sum() / ((tp.sum() + fn.sum() + fp.sum()) + 1e-6)
-            precision[k] = tp.sum() / ((tp.sum() + fp.sum()) + 1e-6)
-            recall[k] = tp.sum() / ((tp.sum() + fn.sum()) + 1e-6)
-            f1_score[k] = 2 * precision[k] * recall[k] / ((precision[k] + recall[k]) + 1e-6)
-            class_acc[k] = tp.sum() / (true_equals_k[:,k].sum() + 1e-6)
-
-        # calculate overall metrics
-        overall_accuracy = torch.eq(y_pred, y_true).float().mean().item()
-        confusion_matrix = torch.zeros((num_classes_at_level, num_classes_at_level)).to(device=cfg.general.device)
-        
-        # calculate confusion matrix
-        true_labels = torch.argmax(true_equals_k.short(),dim=1)
-        pred_labels = torch.argmax(pred_equals_k.short(),dim=1)
-        values = torch.ones(len(true_labels)).to(device=cfg.general.device)
-        confusion_matrix.index_put_((true_labels,pred_labels), values, accumulate=True)
+        return metrics
 
 
-        # save values in a dictionary
-        metrics[level]['overall']['overall_accuracy'] = overall_accuracy
-        metrics[level]['overall']['confusion_matrix'] = confusion_matrix.detach().cpu().numpy()
 
-        metrics[level]['classwise']['iou'] = iou.detach().cpu().numpy()
-        metrics[level]['classwise']['precision'] = precision.detach().cpu().numpy()
-        metrics[level]['classwise']['recall'] = recall.detach().cpu().numpy()
-        metrics[level]['classwise']['f1_score'] = f1_score.detach().cpu().numpy()
-        metrics[level]['classwise']['class_acc'] = class_acc.detach().cpu().numpy()
+def combine_metrics_list(metrics_list:List[Dict], cfg):
 
+    metrics = {ln : dict() for ln in cfg.data.label_names}
+    for label_name in cfg.data.label_names:
+        # classwise
+        metrics[label_name]['classwise'] = {metric: np.concatenate([metrics_list[e][label_name]['classwise'][metric][None,:] 
+                                                                    for e in range(len(metrics_list))],axis=0).mean(axis=0) 
+                                                                    for metric in metrics_list[0][label_name]['classwise'].keys()}
+        # overall
+        metrics[label_name]['overall'] = dict()
+        metrics[label_name]['overall']['overall_accuracy'] = np.mean([metrics_list[e][label_name]['overall']['overall_accuracy'] for e in range(len(metrics_list))])
+        metrics[label_name]['overall']['confusion_matrix'] = np.concatenate([metrics_list[e][label_name]['overall']['confusion_matrix'][None,...] for e in range(len(metrics_list))],axis=0).sum(axis=0)
     return metrics

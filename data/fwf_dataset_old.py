@@ -109,7 +109,9 @@ class FwfDataset(Dataset):
             # save project as dict
             if len(fwf_proj_bboxes)==0 or 'bboxes' not in meta.keys():
                 # handle default case
-            
+                sub = grid_subsample_simple(xyz_defaultBbox,self.cfg.data.query_grid_size, 'cuda' if self.cfg.data.subsample_on_gpu else 'cpu')
+                kd_tree = KDTree(xyz_defaultBbox)
+                _, sub_ids = kd_tree.query(sub['points'])
                 self.projects.append(dict(
                     proj_name=f"{proj_name}::defaultBbox",
                     xyz = xyz_defaultBbox,
@@ -117,11 +119,13 @@ class FwfDataset(Dataset):
                     sop = sop,
                     rgb = rgb,
                     riegl_feats = riegl_feats,
-                    labels = pcd[self.label_names].to_numpy(),
+                    labels = pcd[self.label_names].to_numpy()[sub_ids], # labels need to be subsampeld 
                     sop_ids = pcd['scan_id'].to_numpy(),
-                    kd_tree = KDTree(xyz_defaultBbox),
+                    kd_tree = kd_tree,
+                    xyz_sub = sub['points'],
+                    sub_inv = sub['inv_inds']
                 ))
-                
+                self.proj_lens.append(sub['points'].shape[0])
             else:
                 # handle region bboxes case
                 for bbox_i in fwf_proj_bboxes:
@@ -129,6 +133,9 @@ class FwfDataset(Dataset):
                     bbox = BBox(orientation=np.array(bbox_meta['orientation']), width=np.array(bbox_meta['width']))
                     subcloud_mask=bbox.cutout(xyz_defaultBbox)
                     xyz_masked = xyz_defaultBbox[subcloud_mask]
+                    sub = grid_subsample_simple(xyz_masked, self.cfg.data.query_grid_size, 'cuda' if self.cfg.data.subsample_on_gpu else 'cpu')
+                    kd_tree = KDTree(xyz_masked)
+                    _, sub_ids = kd_tree.query(sub['points'])
                     self.projects.append(dict(
                         proj_name=f"{proj_name}::bboxId={bbox_i:03}",
                         xyz = xyz_masked,
@@ -136,62 +143,35 @@ class FwfDataset(Dataset):
                         sop = sop,
                         rgb = rgb[subcloud_mask],
                         riegl_feats = riegl_feats[subcloud_mask],
-                        labels = pcd[self.label_names].to_numpy()[subcloud_mask], # labels need to be subsampeld
+                        labels = pcd[self.label_names].to_numpy()[subcloud_mask][sub_ids], # labels need to be subsampeld
                         sop_ids = pcd['scan_id'].to_numpy()[subcloud_mask],
                         kd_tree = KDTree(xyz_masked),
-
+                        xyz_sub = sub['points'],
+                        sub_inv = sub['inv_inds']
                     ))
-                    
+                    self.proj_lens.append(sub['points'].shape[0])
                     
             # calculate the cumulative sum of the point cloud sizes
 
-
-
-
-    def subsample_grid(self, grid_size:float, save_inv=True):
-        self.proj_lens = []
-        for i, proj in enumerate(self.projects):
-            sub = grid_subsample_simple(proj['xyz'],self.cfg.data.query_grid_size, 'cuda' if self.cfg.data.subsample_on_gpu else 'cpu')
-            _, sub_ids = proj['kd_tree'].query(sub['points'])
-            self.projects[i].update(dict(
-                labels_sub = proj['labels'][sub_ids], # labels need to be subsampeld 
-                xyz_sub = sub['points'],
-                sub_inv = sub['inv_inds'] if save_inv else None
-            ))
-            self.proj_lens.append(sub['points'].shape[0])
-        self.proj_lens_cumsum = np.cumsum(self.proj_lens)
-
-    def subsample_random(self, sample_ratio: float, save_inv=True):
-
-        assert 0 < sample_ratio <= 1, "Sample ratio must be between 0 and 1."
-        
-        self.proj_lens = []
-        for i, proj in enumerate(self.projects):
-            num_points = proj['xyz'].shape[0]
-            sample_size = int(sample_ratio * num_points)
-            sampled_ids = np.random.choice(num_points, sample_size, replace=True)
-
-            self.projects[i].update(dict(
-                labels_sub = proj['labels'][sampled_ids],  # Subsample labels
-                xyz_sub = proj['xyz'][sampled_ids],  # Subsample coordinates
-                sub_inv = np.argsort(sampled_ids) if save_inv else None  # Save inverse indices if needed
-            ))
-            self.proj_lens.append(len(sampled_ids))
-        
+            if counter >= 3:
+                continue
+                break
+            else:
+                counter += 1
         self.proj_lens_cumsum = np.cumsum(self.proj_lens)
     
-    def compute_neibors_knn(self, k:int, verbose=True):
+    def compute_neibors_knn(self, k:int):
         for proj in self.projects:
-            if verbose: print(f"Computing neibors for '{proj['proj_name']}' @ k={k}")
+            print(f"Computing neibors for '{proj['proj_name']}' @ k={k}")
             dists, neib_ids = proj['kd_tree'].query(proj['xyz_sub'], k)
             proj['neibors'] = neib_ids
     
 
    
-    def compute_normals_knn(self, verbose=True):
+    def compute_normals_knn(self):
         for proj in self.projects:
             k = proj['neibors'].shape[1]
-            if verbose: print(f"Computing normals for '{proj['proj_name']}' @ k={k}")
+            print(f"Computing normals for '{proj['proj_name']}' @ k={k}")
             neibs_xyz = proj['xyz'][proj['neibors']]
 
             means = neibs_xyz.mean(axis=1, keepdims=True)
@@ -214,9 +194,9 @@ class FwfDataset(Dataset):
 
 
             
-    def compute_incAngles(self, verbose=True):
+    def compute_incAngles(self):
         for proj in self.projects:
-            if verbose: print(f"Computing incidence angles for '{proj['proj_name']}'")
+            print(f"Computing incidence angles for '{proj['proj_name']}'")
             xyz_scannerCs = proj['xyz'] - proj['sop'][proj['sop_ids']][:,:3,3]
             proj['incAngles']= np.arccos(np.squeeze((proj['normals'][:,None,:] @ xyz_scannerCs[...,None])) / \
                 (np.linalg.norm(xyz_scannerCs,axis=-1) * np.linalg.norm(proj['normals'],axis=-1)))
@@ -233,22 +213,24 @@ class FwfDataset(Dataset):
         size_prev = self.proj_lens_cumsum[proj_idx-1] if proj_idx > 0 else 0
         residual_idx = index - size_prev
         
+        proj = self.projects[proj_idx]
+
         # get neibors of point at index
-        neibs = self.projects[proj_idx]['neibors'][residual_idx]
+        neibs = proj['neibors'][residual_idx]
 
         return_dict = dict(
             features_neibors = np.concatenate(
                 [
-                    self.transforms_dict[f](self.projects[proj_idx][f][neibs])
-                    if f in self.transforms_dict else self.projects[proj_idx][f][neibs]
+                    self.transforms_dict[f](proj[f][neibs])
+                    if f in self.transforms_dict else proj[f][neibs]
                     for f in self.cfg.data.scalar_input_fields
                 ],
                 axis=-1
             ).astype(np.float32),
             features_point = np.concatenate(
                 [
-                    self.transforms_dict[f](self.projects[proj_idx][f][residual_idx][None,:])
-                    if f in self.transforms_dict else self.projects[proj_idx][f][residual_idx][None,:]
+                    self.transforms_dict[f](proj[f][residual_idx][None,:])
+                    if f in self.transforms_dict else proj[f][residual_idx][None,:]
                     for f in self.cfg.data.scalar_input_fields
                 ],
                 axis=-1
@@ -257,14 +239,14 @@ class FwfDataset(Dataset):
 
         # add waveforms
         return_dict.update(dict(
-            wfm_neibors = self.projects[proj_idx]['wfm'][neibs] if self.cfg.data.fw_input_field else None,
-            wfm_point = self.projects[proj_idx]['wfm'][residual_idx][None,:] if self.cfg.data.fw_input_field else None,
+            wfm_neibors = proj['wfm'][neibs] if self.cfg.data.fw_input_field else None,
+            wfm_point = proj['wfm'][residual_idx][None,:] if self.cfg.data.fw_input_field else None,
         )) # type:ignore
 
         # add labels as separate entries
         for label_i, label_name in enumerate(self.label_names):
             return_dict.update({
-                label_name : self.projects[proj_idx]['labels_sub'][residual_idx][label_i]
+                label_name : proj['labels'][residual_idx][label_i]
             })
 
 
