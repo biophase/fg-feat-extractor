@@ -1,7 +1,7 @@
 data:
   preprocess_raw:
-    # raw_dir: /media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/02_Datasets/FWF_Aachen_labeled
-    raw_dir: "D:\\Projekte\\GIA_220412_PCS\\02_Datasets\\FullWaveForm\\full_waveform_software\\FullWaveformParse_mass\\output\\FWF_Aachen_labeled\\" # work pc
+    raw_dir: /media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/02_Datasets/FWF_Aachen_labeled
+    # raw_dir: "D:\\Projekte\\GIA_220412_PCS\\02_Datasets\\FullWaveForm\\full_waveform_software\\FullWaveformParse_mass\\output\\FWF_Aachen_labeled\\" # work pc
     preprocessed_dir:
     voxel_size: 0.01
-    output_dir: ${data.preprocess_raw.raw_dir}/../FWF_Subsampled/${data.preprocess_raw.voxel_size}/
+    output_dir_subsampling: ${data.preprocess_raw.raw_dir}/../FWF_Subsampled/${data.preprocess_raw.voxel_size}/

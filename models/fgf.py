@@ -3,7 +3,7 @@ import torch
 import os
 import json
 
-from data.fwf_dataset import get_label_structure
+from data.fwf_dataset import get_label_structure_from_file
 
 
 
@@ -12,13 +12,13 @@ class FGFeatNetwork (nn.Module):
                  cfg,
                  num_input_feats,
                  label_structure = {'labels_0':3, 'labels_1':10, 'labels_2':12, 'labels_3':18},
-                 dropout_prob = 0.2,
                  global_constraint = False,
                  ):
         super(FGFeatNetwork, self).__init__()
         
-        self.label_structure = get_label_structure(cfg)
+        self.label_structure = get_label_structure_from_file(cfg)
         self.global_constraint = cfg.model.use_global_constraint
+        dropout_prob = cfg.model.dropout_prob
         # Pointwise feats
         self.mlp1 = nn.Sequential(
             nn.Linear(num_input_feats, 64), nn.ReLU(), nn.Dropout(p=dropout_prob),

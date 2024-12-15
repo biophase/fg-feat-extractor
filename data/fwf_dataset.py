@@ -18,7 +18,7 @@ from utils.pointcloud import grid_subsample_simple, BBox
 
 
 
-def get_label_structure(cfg):
+def get_label_structure_from_file(cfg):
     with open(os.path.join(cfg.data.dataset_root,"class_dict.json"),"r") as f:
         class_dict =  json.load(f) 
         return {k: len(class_dict[k]) for k in class_dict.keys() if k in cfg.data.label_names}
@@ -29,6 +29,8 @@ class FwfDataset(Dataset):
                  cfg,
                  cfg_transforms,
                  cfg_projDataDescrs,
+                 return_projIdx = False,
+                 return_resiIdx = False,
                  ):
         
         super(Dataset,self).__init__()
@@ -41,6 +43,8 @@ class FwfDataset(Dataset):
         
         # keep track of point cloud sizes
         self.proj_lens = []
+        self.return_projIdx = return_projIdx
+        self.return_resiIdx = return_resiIdx
 
         # build transforms
         self.transforms_dict = {}
@@ -150,8 +154,9 @@ class FwfDataset(Dataset):
 
     def subsample_grid(self, grid_size:float, save_inv=True):
         self.proj_lens = []
+        if not grid_size: grid_size = self.cfg.data.query_grid_size
         for i, proj in enumerate(self.projects):
-            sub = grid_subsample_simple(proj['xyz'],self.cfg.data.query_grid_size, 'cuda' if self.cfg.data.subsample_on_gpu else 'cpu')
+            sub = grid_subsample_simple(proj['xyz'],grid_size, 'cuda' if self.cfg.data.subsample_on_gpu else 'cpu')
             _, sub_ids = proj['kd_tree'].query(sub['points'])
             self.projects[i].update(dict(
                 labels_sub = proj['labels'][sub_ids], # labels need to be subsampeld 
@@ -266,6 +271,16 @@ class FwfDataset(Dataset):
             return_dict.update({
                 label_name : self.projects[proj_idx]['labels_sub'][residual_idx][label_i]
             })
+        
+        # return inverse indices for testing
+        if self.return_projIdx:
+            return_dict.update(dict(
+                proj_idx = proj_idx
+            ))
+        if self.return_resiIdx:
+            return_dict.update(dict(
+                residual_idx = residual_idx
+            ))    
 
 
         

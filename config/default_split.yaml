@@ -24,4 +24,12 @@ data:
     - proj_name: "2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj" # bridge (concrete, steel, brick)
       bboxes: [0]
     - proj_name: "2024-07-31_FW_Bruecke_Turmstr.FwfProj" # bridge (concrete/steel)
+  _testProjects_:
+    - proj_name: "2023-08-28_FW_EingangBauing.FwfProj" # building
+    - proj_name: "2024-04-05_FW_Westbahnhof_01.FwfProj" # tunnel-bridge
+    - proj_name: "2024-07-31_FW_Bruecke_Koenigstr.FwfProj" # bridge (steel+stone)
+      bboxes: [1]
+    - proj_name: "2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj" # bridge (concrete, steel, brick)
+      bboxes: [0]
+    - proj_name: "2024-07-31_FW_Bruecke_Turmstr.FwfProj" # bridge (concrete/steel)
 

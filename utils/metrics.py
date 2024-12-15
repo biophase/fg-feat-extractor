@@ -137,3 +137,31 @@ def combine_metrics_list(metrics_list:List[Dict], cfg):
         metrics[label_name]['overall']['overall_accuracy'] = np.mean([metrics_list[e][label_name]['overall']['overall_accuracy'] for e in range(len(metrics_list))])
         metrics[label_name]['overall']['confusion_matrix'] = np.concatenate([metrics_list[e][label_name]['overall']['confusion_matrix'][None,...] for e in range(len(metrics_list))],axis=0).sum(axis=0)
     return metrics
+
+
+class EarlyStopping:
+    def __init__(self, patience=5, min_delta=0.0):
+        """
+        Args:
+            patience (int): How many epochs to wait after the last improvement.
+            min_delta (float): Minimum change in the monitored quantity to qualify as an improvement.
+        """
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.best_value = None
+        self.early_stop = False
+        self.new_best = False
+
+    def __call__(self, value):
+        self.new_best = False
+        if self.best_value is None:
+            self.best_value = value
+        elif value < self.best_value - self.min_delta:
+            self.best_value = value
+            self.counter = 0
+            self.new_best = True
+        else:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True

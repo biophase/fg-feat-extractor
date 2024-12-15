@@ -1,0 +1,18 @@
+data:
+  preprocess_raw:
+  
+    output_dir_merged: ${data.preprocess_raw.raw_dir}/../FWF_Subsampled/${data.preprocess_raw.voxel_size}_${data.label_merge.name}/
+  
+  label_merge:
+    name: "simple"
+    groups:
+      labels_0:
+      labels_1:
+        _unspecified: ['unspecified']
+      labels_2:
+        _unspecified: ['unspecified']
+      labels_3:
+        _unspecified: ['unspecified', 'plastic']
+        brick: ['brick', 'brick(graffiti)']
+        concrete: ['concrete', 'concrete(rough)', 'concrete(graffiti)']
+        vegetation: ['leaves','grass','soil']
