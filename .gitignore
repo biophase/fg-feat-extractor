@@ -5,7 +5,7 @@ __pycache__/
 
 # experiments
 exp/*/*.pth
-
+*.ply
 # C extensions
 *.so
 
