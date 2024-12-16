@@ -198,7 +198,7 @@ class FwfDataset(Dataset):
             if extract_geometric == None:
                 extract_geometric = 'geom_feats' in self.cfg.data.scalar_input_fields
             k = proj['neibors'].shape[1]
-            if verbose: print(f"Computing normals {"and geom_feats " if extract_geometric else ""}for '{proj['proj_name']}' @ k={k}")
+            if verbose: print(f"Computing normals {'and geom_feats ' if extract_geometric else ''}for '{proj['proj_name']}' @ k={k}")
             neibs_xyz = proj['xyz'][proj['neibors']]
 
             means = neibs_xyz.mean(axis=1, keepdims=True)
