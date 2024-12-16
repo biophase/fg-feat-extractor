@@ -198,42 +198,45 @@ class FwfDataset(Dataset):
             if extract_geometric == None:
                 extract_geometric = 'geom_feats' in self.cfg.data.scalar_input_fields
             k = proj['neibors'].shape[1]
-            if verbose: print(f"Computing normals {"and geom_feats" if extract_geometric else ""}for '{proj['proj_name']}' @ k={k}")
+            if verbose: print(f"Computing normals {"and geom_feats " if extract_geometric else ""}for '{proj['proj_name']}' @ k={k}")
             neibs_xyz = proj['xyz'][proj['neibors']]
 
             means = neibs_xyz.mean(axis=1, keepdims=True)
             neibs_xyz -= means
             cov = (neibs_xyz.transpose([0,2,1]) @ neibs_xyz) / (k-1)
             eigenvals, eigenvecs = np.linalg.eigh(cov)
+            eigenvals = np.clip(eigenvals, a_min=1e-10, a_max=None)
             # get non-flipped normals
             normals = eigenvecs[:, :, 0]
 
             # upsample normals to full resolution
             normals = normals[proj['sub_inv']]
-            
+
             # move all points to scanner CS
             points_origin_scanPos = proj['sop'][proj['sop_ids']][:,:3,3]
             xyz_scannerCs = proj['xyz'] - points_origin_scanPos
             signs = np.sign(np.squeeze(xyz_scannerCs[:,None,:] @ normals [:,:,None])) * -1
             normals *= signs[:,None]
-            
+
             proj['normals'] = normals
 
             if extract_geometric:
                 eigenvals = np.sort(eigenvals)[:,::-1]
                 # Compute geometric features
-                linearity = (eigenvals[:, 0] - eigenvals[:, 1]) / eigenvals[:, 0]
-                planarity = (eigenvals[:, 1] - eigenvals[:, 2]) / eigenvals[:, 0]
-                sphericity = eigenvals[:, 2] / eigenvals[:, 0]
+                linearity = (eigenvals[:, 0] - eigenvals[:, 1]) / (eigenvals[:, 0] + 1e-10)
+                planarity = (eigenvals[:, 1] - eigenvals[:, 2]) / (eigenvals[:, 0] + 1e-10)
+                sphericity = eigenvals[:, 2] / (eigenvals[:, 0] + 1e-10)
                 omnivariance = np.cbrt(eigenvals.prod(axis=1))
-                anisotropy = (eigenvals[:, 0] - eigenvals[:, 2]) / eigenvals[:, 0]
-                eigenentropy = -np.sum((eigenvals / eigenvals.sum(axis=1, keepdims=True)) *
+                anisotropy = (eigenvals[:, 0] - eigenvals[:, 2]) / (eigenvals[:, 0] + 1e-10)
+                eigenentropy = -np.sum((eigenvals / (eigenvals.sum(axis=1, keepdims=True) + 1e-10)) *
                                     np.log(eigenvals / eigenvals.sum(axis=1, keepdims=True) + 1e-10), axis=1)
                 
-                # Combine features into a single matrix (N x 6)
-                proj['geom_feats'] = np.stack([
+                # Combine features into a single matrix (N x 6) by stacking and upsampling
+                geom_feats = np.stack([
                     linearity, planarity, sphericity, omnivariance, anisotropy, eigenentropy
-                ], axis=1)
+                ], axis=1)[proj['sub_inv']]
+                proj['geom_feats'] = geom_feats
+                
 
        
     def compute_incAngles(self, verbose=True):

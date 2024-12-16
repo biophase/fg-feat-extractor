@@ -6,6 +6,7 @@ __pycache__/
 # experiments
 exp/*/*.pth
 *.ply
+*.zip
 # C extensions
 *.so
 
