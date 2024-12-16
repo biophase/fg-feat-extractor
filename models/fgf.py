@@ -16,6 +16,7 @@ class FGFeatNetwork (nn.Module):
                  ):
         super(FGFeatNetwork, self).__init__()
         
+        self.cfg = cfg
         self.label_structure = get_label_structure_from_file(cfg)
         self.global_constraint = cfg.model.use_global_constraint
         dropout_prob = cfg.model.dropout_prob

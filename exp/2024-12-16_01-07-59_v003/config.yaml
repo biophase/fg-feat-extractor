@@ -1,6 +1,6 @@
 experiment:
-  title_suffix: ''
-  description: ''
+  title_suffix: v003
+  description: Waveform +-
 general:
   device: cuda
   batch_size: 1024
@@ -59,8 +59,6 @@ data:
   - xyz
   - rgb
   - riegl_feats
-  - geom_feats
-  - normals
   - incAngles
   - distanceFromScanner
   fw_input_field: true
