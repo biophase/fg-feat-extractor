@@ -193,10 +193,12 @@ class FwfDataset(Dataset):
     
 
    
-    def compute_normals_knn(self, verbose=True):
+    def compute_normals_knn(self, extract_geometric = None, verbose=True):
         for proj in self.projects:
+            if extract_geometric == None:
+                extract_geometric = 'geom_feats' in self.cfg.data.scalar_input_fields
             k = proj['neibors'].shape[1]
-            if verbose: print(f"Computing normals for '{proj['proj_name']}' @ k={k}")
+            if verbose: print(f"Computing normals {"and geom_feats" if extract_geometric else ""}for '{proj['proj_name']}' @ k={k}")
             neibs_xyz = proj['xyz'][proj['neibors']]
 
             means = neibs_xyz.mean(axis=1, keepdims=True)
@@ -217,8 +219,23 @@ class FwfDataset(Dataset):
             
             proj['normals'] = normals
 
+            if extract_geometric:
+                eigenvals = np.sort(eigenvals)[:,::-1]
+                # Compute geometric features
+                linearity = (eigenvals[:, 0] - eigenvals[:, 1]) / eigenvals[:, 0]
+                planarity = (eigenvals[:, 1] - eigenvals[:, 2]) / eigenvals[:, 0]
+                sphericity = eigenvals[:, 2] / eigenvals[:, 0]
+                omnivariance = np.cbrt(eigenvals.prod(axis=1))
+                anisotropy = (eigenvals[:, 0] - eigenvals[:, 2]) / eigenvals[:, 0]
+                eigenentropy = -np.sum((eigenvals / eigenvals.sum(axis=1, keepdims=True)) *
+                                    np.log(eigenvals / eigenvals.sum(axis=1, keepdims=True) + 1e-10), axis=1)
+                
+                # Combine features into a single matrix (N x 6)
+                proj['geom_feats'] = np.stack([
+                    linearity, planarity, sphericity, omnivariance, anisotropy, eigenentropy
+                ], axis=1)
 
-            
+       
     def compute_incAngles(self, verbose=True):
         for proj in self.projects:
             if verbose: print(f"Computing incidence angles for '{proj['proj_name']}'")

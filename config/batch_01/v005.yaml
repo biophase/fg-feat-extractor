@@ -1,6 +1,6 @@
 experiment:
-  title_suffix: ""
-  description: ""
+  title_suffix: "v005"
+  description: "Is scan position information relevant for waveform?  (compare with v004)"
 general:
   device: 'cuda'
   batch_size : 1024
@@ -56,11 +56,6 @@ data:
   scalar_input_fields:
     - 'xyz'
     - 'rgb'
-    - 'riegl_feats'
-    - 'geom_feats'
-    - 'normals'
-    - 'incAngles'
-    - 'distanceFromScanner'
   fw_input_field: True
   label_names:
     # - 'labels_0'

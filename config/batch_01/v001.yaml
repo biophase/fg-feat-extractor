@@ -1,6 +1,6 @@
 experiment:
-  title_suffix: ""
-  description: ""
+  title_suffix: "v001"
+  description: "Color +-"
 general:
   device: 'cuda'
   batch_size : 1024
@@ -56,11 +56,7 @@ data:
   scalar_input_fields:
     - 'xyz'
     - 'rgb'
-    - 'riegl_feats'
-    - 'geom_feats'
-    - 'normals'
-    - 'incAngles'
-    - 'distanceFromScanner'
+
   fw_input_field: True
   label_names:
     # - 'labels_0'
@@ -75,7 +71,7 @@ data:
 model:
   use_global_constraint: False
   dropout_prob: 0.3
-  ignore_waveform : False
+  ignore_waveform : True
   ignore_neibors : False
 testing:
   query_grid_size: 0.03

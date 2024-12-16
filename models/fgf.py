@@ -52,6 +52,13 @@ class FGFeatNetwork (nn.Module):
         self.classifier = nn.ModuleDict({k:nn.Linear(128,v) for k,v in self.label_structure.items()})
         
     def forward(self, x):
+        # handles easy ignores
+        if self.cfg.model.ignore_waveform:
+            x['wfm_neibors'] *= 0
+            x['wfm_point'] *= 0
+        if self.cfg.model.ignore_neibors:
+            x['features_neibors'] *= 0
+            x['wfm_neibors'] *= 0
         # handle neibor features
         pw_feats_neib = self.mlp1(x['features_neibors'])
         batch, neibor, signal_length = x['wfm_neibors'].shape

@@ -1,6 +1,6 @@
 experiment:
-  title_suffix: ""
-  description: ""
+  title_suffix: "v007"
+  description: "Are neibors needed? (compare with v006)"
 general:
   device: 'cuda'
   batch_size : 1024
@@ -76,7 +76,7 @@ model:
   use_global_constraint: False
   dropout_prob: 0.3
   ignore_waveform : False
-  ignore_neibors : False
+  ignore_neibors : True
 testing:
   query_grid_size: 0.03
   batch_size: 1024

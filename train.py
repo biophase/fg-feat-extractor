@@ -36,6 +36,10 @@ def main():
 
 
     print(OmegaConf.to_yaml(cfg))
+    exp_dir = f"./exp/{generate_timestamp()}_{cfg.experiment.title_suffix}"
+    os.makedirs(exp_dir,exist_ok=True)
+    OmegaConf.save(cfg, f=os.path.join(exp_dir,'config.yaml'))
+
 
     # initialize datasets
     train_ds = FwfDataset(cfg, cfg.data.preprocessing._transformsTraining_, cfg.data._trainProjects_)
@@ -69,8 +73,7 @@ def main():
     optim = Adam(params=model.parameters(), weight_decay=cfg.general.weight_decay)
     val_dl = DataLoader(val_ds, batch_size=cfg.general.batch_size, num_workers = cfg.general.num_workers)
     early_stopping = EarlyStopping(min_delta=cfg.general.early_stopping_minDelta)
-    exp_dir = f"./exp/{generate_timestamp()}"
-    os.makedirs(exp_dir,exist_ok=True)
+  
 
     
     # train loop
@@ -214,10 +217,6 @@ def main():
             torch.save(model.state_dict(),os.path.join(exp_dir,'best_model.pth'))
         
     print('\n')
-
-    
-    
-
 
 
 if __name__=='__main__':
