@@ -1,0 +1,3472 @@
+(base) hristo@hristo-north:/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor$ bash train_batch.sh ./config/batch_01/
+experiment:
+  title_suffix: v002
+  description: Riegl +-
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  - riegl_feats
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: true
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+^[[CLoading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+^[[1;3ALoading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.74.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.95it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.60977  0.176257  0.236474  0.238349  0.223121  0.238349
+sklearn miou: {'labels_3': 0.47131218518726853}
+labels_3 : tensor([7.0445e-03, 1.1245e-01, 2.6894e-02, 0.0000e+00, 3.2821e-01, 2.2069e-06,
+        1.5642e-02, 2.2755e-02, 7.5642e-03, 1.8156e-03, 0.0000e+00, 8.7393e-02],
+       device='cuda:0')
+L_train:1.1127 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.35it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.202854  0.016905  0.083333  0.016905  0.028107  0.016905
+sklearn miou: {'labels_3': 0.1128757799205899}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.2029], device='cuda:0')
+L_val:6.3619
+Epoch-001
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:46<00:00,  3.91it/s]
+own metrics:
+                oA    mIoU        mP        mR       mF1     mcAcc
+labels_3  0.664069  0.2086  0.273097  0.273713  0.261596  0.273713
+sklearn miou: {'labels_3': 0.524373353694836}
+labels_3 : tensor([7.7915e-03, 1.2227e-01, 2.7871e-02, 0.0000e+00, 3.1642e-01, 4.4138e-06,
+        1.5489e-02, 2.8296e-02, 1.9564e-02, 3.9009e-03, 0.0000e+00, 1.2246e-01],
+       device='cuda:0')
+L_train:0.9721 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.28it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.440367  0.036697  0.083333  0.036697  0.050955  0.036697
+sklearn miou: {'labels_3': 0.2823529411764706}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.4404], device='cuda:0')
+L_val:2.0673
+Epoch-002
+Sampling training dataset. Done. Took 13.76.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.92it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.684494  0.221243  0.291776  0.284355  0.275249  0.284355
+sklearn miou: {'labels_3': 0.5432251705181064}
+labels_3 : tensor([8.0608e-03, 1.2431e-01, 3.6013e-02, 1.1035e-06, 3.1509e-01, 1.1035e-06,
+        1.6485e-02, 3.3443e-02, 1.7125e-02, 3.4874e-03, 6.6208e-06, 1.3047e-01],
+       device='cuda:0')
+L_train:0.9248 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.31it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.464832  0.038736  0.083333  0.038736  0.052888  0.038736
+sklearn miou: {'labels_3': 0.30278884462151395}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.4648], device='cuda:0')
+L_val:2.2801
+Epoch-003
+Sampling training dataset. Done. Took 13.61.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.695937  0.231682  0.302023  0.294033  0.285736  0.294033
+sklearn miou: {'labels_3': 0.557272697883861}
+labels_3 : tensor([9.4633e-03, 1.2536e-01, 3.4475e-02, 1.3242e-05, 3.1328e-01, 0.0000e+00,
+        1.5894e-02, 2.9416e-02, 2.7095e-02, 4.1025e-03, 0.0000e+00, 1.3684e-01],
+       device='cuda:0')
+L_train:0.8887 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.33it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.444444  0.037037  0.083333  0.037037  0.051282  0.037037
+sklearn miou: {'labels_3': 0.2857142857142857}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.4444], device='cuda:0')
+L_val:1.9737
+Epoch-004
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.92it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.697631  0.230637  0.301152  0.292879  0.283194  0.292879
+sklearn miou: {'labels_3': 0.5594923359301899}
+labels_3 : tensor([9.0517e-03, 1.2601e-01, 3.3193e-02, 3.3104e-06, 3.1245e-01, 0.0000e+00,
+        1.6781e-02, 3.1546e-02, 2.9732e-02, 2.8347e-03, 6.6208e-06, 1.3602e-01],
+       device='cuda:0')
+L_train:0.8778 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.32it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.70948  0.059123  0.083333  0.059123  0.069171  0.059123
+sklearn miou: {'labels_3': 0.5497630331753555}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.7095], device='cuda:0')
+L_val:0.6168
+Epoch-005
+Sampling training dataset. Done. Took 13.58.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.92it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.715581  0.241633  0.311715  0.303821  0.295309  0.303821
+sklearn miou: {'labels_3': 0.5780877625075436}
+labels_3 : tensor([0.0092, 0.1257, 0.0370, 0.0000, 0.3186, 0.0000, 0.0175, 0.0343, 0.0333,
+        0.0027, 0.0000, 0.1374], device='cuda:0')
+L_train:0.8535 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.36it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.502548  0.041879  0.083333  0.041879  0.055744  0.041879
+sklearn miou: {'labels_3': 0.3356024506466984}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.5025], device='cuda:0')
+L_val:1.5481
+Epoch-006
+Sampling training dataset. Done. Took 13.83.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+              oA      mIoU       mP        mR       mF1     mcAcc
+labels_3  0.7179  0.241299  0.30949  0.302307  0.293674  0.302307
+sklearn miou: {'labels_3': 0.5810869920259117}
+labels_3 : tensor([0.0086, 0.1267, 0.0367, 0.0000, 0.3167, 0.0000, 0.0173, 0.0362, 0.0341,
+        0.0026, 0.0000, 0.1391], device='cuda:0')
+L_train:0.8400 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.28it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.411825  0.034319  0.083333  0.034319  0.048616  0.034319
+sklearn miou: {'labels_3': 0.2593068035943517}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.4118], device='cuda:0')
+L_val:1.8024
+Epoch-007
+Sampling training dataset. Done. Took 13.65.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.716086  0.240143  0.312591  0.301435  0.292803  0.301435
+sklearn miou: {'labels_3': 0.5793930086669283}
+labels_3 : tensor([9.4644e-03, 1.2607e-01, 3.2594e-02, 1.5448e-05, 3.1854e-01, 0.0000e+00,
+        1.7357e-02, 3.6421e-02, 3.5560e-02, 2.5202e-03, 0.0000e+00, 1.3755e-01],
+       device='cuda:0')
+L_train:0.8409 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.27it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.437309  0.036442  0.083333  0.036442  0.050709  0.036442
+sklearn miou: {'labels_3': 0.27984344422700586}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.4373], device='cuda:0')
+L_val:1.6589
+Epoch-008
+Sampling training dataset. Done. Took 13.92.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.718848  0.246138  0.322316  0.305974  0.299174  0.305974
+sklearn miou: {'labels_3': 0.5831031084072751}
+labels_3 : tensor([9.5306e-03, 1.2590e-01, 3.2497e-02, 0.0000e+00, 3.2147e-01, 6.6208e-06,
+        1.7063e-02, 3.9710e-02, 2.7399e-02, 2.9145e-03, 0.0000e+00, 1.4236e-01],
+       device='cuda:0')
+L_train:0.8128 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.25it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:3.4401
+Epoch-009
+Sampling training dataset. Done. Took 13.51.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.72748  0.250615  0.324701  0.310843  0.304952  0.310843
+sklearn miou: {'labels_3': 0.5917087184113149}
+labels_3 : tensor([9.1521e-03, 1.2640e-01, 3.7101e-02, 3.3104e-06, 3.2007e-01, 0.0000e+00,
+        1.7201e-02, 4.2275e-02, 3.0191e-02, 2.7391e-03, 8.8277e-06, 1.4233e-01],
+       device='cuda:0')
+L_train:0.8004 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:08<00:00, 12.25it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.028542  0.002379  0.083333  0.002379  0.004625  0.002379
+sklearn miou: {'labels_3': 0.014477766287487074}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.0285], device='cuda:0')
+L_val:2.8076
+Early stopping triggered
+
+
+experiment:
+  title_suffix: v003
+  description: Waveform +-
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  - riegl_feats
+  - incAngles
+  - distanceFromScanner
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: false
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.73.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP       mR      mF1    mcAcc
+labels_3  0.658655  0.213246  0.280686  0.27113  0.26127  0.27113
+sklearn miou: {'labels_3': 0.5306434349784819}
+labels_3 : tensor([9.6133e-03, 1.1241e-01, 2.8068e-02, 0.0000e+00, 3.2445e-01, 2.4276e-05,
+        1.5843e-02, 4.1230e-02, 1.6243e-02, 2.1671e-03, 9.9311e-05, 1.0851e-01],
+       device='cuda:0')
+L_train:0.9742 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:20<00:00, 10.43it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.1391
+Epoch-001
+Sampling training dataset. Done. Took 13.82.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.95it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.71936  0.251783  0.335521  0.313973  0.306385  0.313973
+sklearn miou: {'labels_3': 0.5903737892348511}
+labels_3 : tensor([1.0160e-02, 1.2330e-01, 3.2179e-02, 0.0000e+00, 3.2226e-01, 1.7214e-04,
+        1.7218e-02, 4.7052e-02, 3.0883e-02, 3.5402e-03, 1.3021e-04, 1.3246e-01],
+       device='cuda:0')
+L_train:0.8232 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:21<00:00, 10.40it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.996942  0.083078  0.083333  0.083078  0.083206  0.083078
+sklearn miou: {'labels_3': 0.9939024390243902}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9969], device='cuda:0')
+L_val:0.1329
+Epoch-002
+Sampling training dataset. Done. Took 13.72.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.720513  0.256808  0.334183  0.318332  0.310655  0.318332
+sklearn miou: {'labels_3': 0.5936405537353046}
+labels_3 : tensor([1.0234e-02, 1.2725e-01, 3.4375e-02, 0.0000e+00, 3.1682e-01, 2.2621e-04,
+        1.6793e-02, 4.6809e-02, 3.0281e-02, 4.3517e-03, 2.8690e-05, 1.3335e-01],
+       device='cuda:0')
+L_train:0.8122 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:20<00:00, 10.43it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.990826  0.082569  0.083333  0.082569  0.082949  0.082569
+sklearn miou: {'labels_3': 0.9818181818181818}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9908], device='cuda:0')
+L_val:0.2055
+Epoch-003
+Sampling training dataset. Done. Took 13.71.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.732963  0.265007  0.347471  0.326748  0.32073  0.326748
+sklearn miou: {'labels_3': 0.6054261434963814}
+labels_3 : tensor([1.1362e-02, 1.2588e-01, 3.5128e-02, 2.2069e-06, 3.2633e-01, 5.1311e-04,
+        1.6906e-02, 4.9524e-02, 2.5088e-02, 5.0273e-03, 4.4138e-05, 1.3716e-01],
+       device='cuda:0')
+L_train:0.7774 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:20<00:00, 10.46it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.1491
+Epoch-004
+Sampling training dataset. Done. Took 13.69.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.742483  0.278455  0.365609  0.339467  0.335655  0.339467
+sklearn miou: {'labels_3': 0.6190177193165357}
+labels_3 : tensor([1.1139e-02, 1.2793e-01, 3.8253e-02, 0.0000e+00, 3.2192e-01, 4.3587e-04,
+        1.7187e-02, 5.4713e-02, 2.7943e-02, 5.0088e-03, 1.7214e-04, 1.3778e-01],
+       device='cuda:0')
+L_train:0.7467 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:20<00:00, 10.42it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.998981  0.083248  0.083333  0.083248  0.083291  0.083248
+sklearn miou: {'labels_3': 0.9979633401221996}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9990], device='cuda:0')
+L_val:0.1181
+Epoch-005
+Sampling training dataset. Done. Took 13.65.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU       mP        mR       mF1     mcAcc
+labels_3  0.747134  0.273121  0.36319  0.334967  0.330681  0.334967
+sklearn miou: {'labels_3': 0.6207720619171532}
+labels_3 : tensor([1.0665e-02, 1.2531e-01, 4.1219e-02, 0.0000e+00, 3.2725e-01, 6.9187e-04,
+        1.6689e-02, 5.0858e-02, 2.6486e-02, 5.9357e-03, 2.0966e-04, 1.4182e-01],
+       device='cuda:0')
+L_train:0.7582 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:20<00:00, 10.45it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.991845  0.082654  0.083333  0.082654  0.082992  0.082654
+sklearn miou: {'labels_3': 0.9838220424671386}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9918], device='cuda:0')
+L_val:0.1588
+Epoch-006
+Sampling training dataset. Done. Took 13.65.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.754032  0.289038  0.382581  0.350472  0.349037  0.350472
+sklearn miou: {'labels_3': 0.6305315186507416}
+labels_3 : tensor([1.1351e-02, 1.2524e-01, 3.8675e-02, 1.1035e-06, 3.2892e-01, 7.6911e-04,
+        1.6968e-02, 5.2908e-02, 3.0921e-02, 5.7923e-03, 3.2111e-04, 1.4216e-01],
+       device='cuda:0')
+L_train:0.7246 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:21<00:00, 10.40it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.977574  0.081464  0.083333  0.081464  0.082388  0.081464
+sklearn miou: {'labels_3': 0.9561316051844466}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9776], device='cuda:0')
+L_val:0.2110
+Epoch-007
+Sampling training dataset. Done. Took 13.61.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.750381  0.269704  0.357299  0.330977  0.326468  0.330977
+sklearn miou: {'labels_3': 0.6234830441941298}
+labels_3 : tensor([9.4798e-03, 1.2745e-01, 3.6295e-02, 2.2069e-06, 3.2858e-01, 6.7973e-04,
+        1.6734e-02, 5.2447e-02, 3.2039e-02, 4.0443e-03, 1.4566e-04, 1.4249e-01],
+       device='cuda:0')
+L_train:0.7621 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:21<00:00, 10.40it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.824669  0.068722  0.083333  0.068722  0.075326  0.068722
+sklearn miou: {'labels_3': 0.7016478751084129}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.8247], device='cuda:0')
+L_val:0.4409
+Epoch-008
+Sampling training dataset. Done. Took 13.56.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.766656  0.295812  0.387884  0.357176  0.355669  0.357176
+sklearn miou: {'labels_3': 0.6454480024588288}
+labels_3 : tensor([1.1052e-02, 1.2700e-01, 4.4116e-02, 0.0000e+00, 3.3063e-01, 9.8208e-04,
+        1.7005e-02, 5.4339e-02, 3.3822e-02, 6.2201e-03, 2.1628e-04, 1.4127e-01],
+       device='cuda:0')
+L_train:0.7022 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:21<00:00, 10.40it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.988787  0.082399  0.083333  0.082399  0.082863  0.082399
+sklearn miou: {'labels_3': 0.9778225806451613}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9888], device='cuda:0')
+L_val:0.1900
+Epoch-009
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.775896  0.312842  0.405457  0.374858  0.374515  0.374858
+sklearn miou: {'labels_3': 0.6592622447233478}
+labels_3 : tensor([1.1648e-02, 1.2735e-01, 3.9911e-02, 1.9862e-05, 3.3649e-01, 1.2988e-03,
+        1.7565e-02, 5.6569e-02, 3.6557e-02, 7.5363e-03, 4.8001e-04, 1.4048e-01],
+       device='cuda:0')
+L_train:0.6848 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:21<00:00, 10.39it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.996942  0.083078  0.083333  0.083078  0.083206  0.083078
+sklearn miou: {'labels_3': 0.9939024390243902}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9969], device='cuda:0')
+L_val:0.1353
+Early stopping triggered
+
+
+experiment:
+  title_suffix: v005
+  description: Is scan position information relevant for waveform?  (compare with
+    v004)
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: false
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.71.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.649855  0.194255  0.253576  0.253856  0.241747  0.253856
+sklearn miou: {'labels_3': 0.5161481199478142}
+labels_3 : tensor([6.9783e-03, 1.1272e-01, 2.3077e-02, 2.5380e-05, 3.1938e-01, 0.0000e+00,
+        1.2869e-02, 3.6974e-02, 2.2639e-02, 2.2787e-03, 1.2138e-04, 1.1280e-01],
+       device='cuda:0')
+L_train:1.0288 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.34it/s]
+own metrics:
+                oA     mIoU        mP       mR       mF1    mcAcc
+labels_3  0.970438  0.08087  0.083333  0.08087  0.082083  0.08087
+sklearn miou: {'labels_3': 0.9425742574257425}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9704], device='cuda:0')
+L_val:0.3388
+Epoch-001
+Sampling training dataset. Done. Took 13.69.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.691161  0.216791  0.284614  0.275304  0.266929  0.275304
+sklearn miou: {'labels_3': 0.5550367792574562}
+labels_3 : tensor([7.7022e-03, 1.1915e-01, 2.3324e-02, 7.0621e-05, 3.2087e-01, 2.2069e-06,
+        1.4271e-02, 4.2519e-02, 2.4330e-02, 2.1861e-03, 1.2138e-04, 1.3662e-01],
+       device='cuda:0')
+L_train:0.9029 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.22it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.941896  0.078491  0.083333  0.078491  0.08084  0.078491
+sklearn miou: {'labels_3': 0.8901734104046243}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9419], device='cuda:0')
+L_val:0.3896
+Epoch-002
+Sampling training dataset. Done. Took 13.73.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU       mP        mR      mF1     mcAcc
+labels_3  0.699185  0.224996  0.29583  0.284667  0.27643  0.284667
+sklearn miou: {'labels_3': 0.563891627080141}
+labels_3 : tensor([6.7918e-03, 1.1815e-01, 2.3047e-02, 8.7173e-05, 3.2114e-01, 2.0966e-05,
+        1.5210e-02, 4.5865e-02, 2.4233e-02, 2.9691e-03, 1.1807e-04, 1.4155e-01],
+       device='cuda:0')
+L_train:0.8861 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.33it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.979613  0.081634  0.083333  0.081634  0.082475  0.081634
+sklearn miou: {'labels_3': 0.9600399600399601}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9796], device='cuda:0')
+L_val:0.2309
+Epoch-003
+Sampling training dataset. Done. Took 13.63.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.706893  0.221369  0.281541  0.279186  0.269025  0.279186
+sklearn miou: {'labels_3': 0.5714439012390712}
+labels_3 : tensor([7.2244e-03, 1.2055e-01, 2.8902e-02, 2.0966e-05, 3.2272e-01, 5.5173e-06,
+        1.5073e-02, 4.2790e-02, 2.4802e-02, 2.6781e-03, 4.6345e-05, 1.4208e-01],
+       device='cuda:0')
+L_train:0.8693 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.36it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.98369  0.081974  0.083333  0.081974  0.082648  0.081974
+sklearn miou: {'labels_3': 0.9679037111334002}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9837], device='cuda:0')
+L_val:0.2545
+Epoch-004
+Sampling training dataset. Done. Took 13.71.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.720757  0.235731  0.306472  0.292724  0.286515  0.292724
+sklearn miou: {'labels_3': 0.5874106074504756}
+labels_3 : tensor([7.9913e-03, 1.2132e-01, 2.9300e-02, 4.9656e-05, 3.2397e-01, 2.8690e-05,
+        1.5789e-02, 4.6402e-02, 2.8299e-02, 2.6069e-03, 2.9793e-04, 1.4470e-01],
+       device='cuda:0')
+L_train:0.8265 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.37it/s]
+own metrics:
+                oA     mIoU        mP       mR       mF1    mcAcc
+labels_3  0.974516  0.08121  0.083333  0.08121  0.082258  0.08121
+sklearn miou: {'labels_3': 0.9502982107355865}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9745], device='cuda:0')
+L_val:0.2348
+Epoch-005
+Sampling training dataset. Done. Took 13.54.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.728094  0.246867  0.326042  0.305264  0.300034  0.305264
+sklearn miou: {'labels_3': 0.5968810881613356}
+labels_3 : tensor([8.5617e-03, 1.2199e-01, 3.0096e-02, 1.6773e-04, 3.2525e-01, 3.6414e-05,
+        1.6682e-02, 4.6390e-02, 3.0665e-02, 3.0345e-03, 3.3545e-04, 1.4489e-01],
+       device='cuda:0')
+L_train:0.8087 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:02<00:00, 13.39it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.942915  0.078576  0.083333  0.078576  0.080885  0.078576
+sklearn miou: {'labels_3': 0.8919961427193829}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9429], device='cuda:0')
+L_val:0.4186
+Epoch-006
+Sampling training dataset. Done. Took 13.67.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA     mIoU       mP       mR       mF1    mcAcc
+labels_3  0.730785  0.24502  0.32588  0.30461  0.298438  0.30461
+sklearn miou: {'labels_3': 0.5986329380486572}
+labels_3 : tensor([8.4481e-03, 1.2057e-01, 2.9245e-02, 1.2579e-04, 3.2942e-01, 8.4966e-05,
+        1.5953e-02, 4.7638e-02, 3.0515e-02, 2.5492e-03, 4.7780e-04, 1.4576e-01],
+       device='cuda:0')
+L_train:0.8078 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.33it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.992864  0.082739  0.083333  0.082739  0.083035  0.082739
+sklearn miou: {'labels_3': 0.9858299595141701}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9929], device='cuda:0')
+L_val:0.2332
+Epoch-007
+Sampling training dataset. Done. Took 13.65.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.732007  0.248258  0.327566  0.306877  0.301783  0.306877
+sklearn miou: {'labels_3': 0.600199476295217}
+labels_3 : tensor([9.5262e-03, 1.2065e-01, 3.2496e-02, 1.9973e-04, 3.2580e-01, 1.7766e-04,
+        1.5377e-02, 4.5905e-02, 3.2768e-02, 2.8599e-03, 1.2690e-04, 1.4612e-01],
+       device='cuda:0')
+L_train:0.8070 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.30it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.986748  0.082229  0.083333  0.082229  0.082777  0.082229
+sklearn miou: {'labels_3': 0.9738430583501007}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9867], device='cuda:0')
+L_val:0.1999
+Epoch-008
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.733717  0.261382  0.351739  0.320113  0.318572  0.320113
+sklearn miou: {'labels_3': 0.6050253717258504}
+labels_3 : tensor([9.7689e-03, 1.2171e-01, 3.2424e-02, 1.5890e-04, 3.3034e-01, 2.4055e-04,
+        1.6518e-02, 4.4972e-02, 3.1325e-02, 3.9325e-03, 4.2925e-04, 1.4190e-01],
+       device='cuda:0')
+L_train:0.7912 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.29it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.904179  0.075348  0.083333  0.075348  0.07914  0.075348
+sklearn miou: {'labels_3': 0.8251162790697675}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9042], device='cuda:0')
+L_val:0.5318
+Epoch-009
+Sampling training dataset. Done. Took 13.54.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.729969  0.253575  0.342263  0.311732  0.309803  0.311732
+sklearn miou: {'labels_3': 0.6002498050970053}
+labels_3 : tensor([9.0671e-03, 1.2090e-01, 3.4949e-02, 1.1476e-04, 3.2118e-01, 2.1849e-04,
+        1.5404e-02, 5.0058e-02, 2.9952e-02, 3.5861e-03, 2.3283e-04, 1.4430e-01],
+       device='cuda:0')
+L_train:0.8005 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.30it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.936799  0.078067  0.083333  0.078067  0.080614  0.078067
+sklearn miou: {'labels_3': 0.8811121764141898}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9368], device='cuda:0')
+L_val:0.4603
+Epoch-010
+Sampling training dataset. Done. Took 13.60.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.721516  0.239759  0.321028  0.297449  0.29278  0.297449
+sklearn miou: {'labels_3': 0.5887572792105109}
+labels_3 : tensor([7.4164e-03, 1.1918e-01, 3.2840e-02, 3.5311e-05, 3.2849e-01, 1.4014e-04,
+        1.5013e-02, 4.3332e-02, 2.7741e-02, 2.9040e-03, 3.5311e-04, 1.4407e-01],
+       device='cuda:0')
+L_train:0.8303 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.24it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.993884  0.082824  0.083333  0.082824  0.083078  0.082824
+sklearn miou: {'labels_3': 0.9878419452887538}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9939], device='cuda:0')
+L_val:0.2749
+Epoch-011
+Sampling training dataset. Done. Took 13.70.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU       mP        mR       mF1     mcAcc
+labels_3  0.733919  0.258952  0.35236  0.318053  0.315994  0.318053
+sklearn miou: {'labels_3': 0.6053003429885024}
+labels_3 : tensor([8.8906e-03, 1.2264e-01, 3.6806e-02, 8.0553e-05, 3.3015e-01, 4.3587e-04,
+        1.5866e-02, 4.2459e-02, 3.0649e-02, 3.2872e-03, 3.9945e-04, 1.4226e-01],
+       device='cuda:0')
+L_train:0.7930 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.35it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.922528  0.076877  0.083333  0.076877  0.079975  0.076877
+sklearn miou: {'labels_3': 0.8561967833491012}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9225], device='cuda:0')
+L_val:0.5490
+Epoch-012
+Sampling training dataset. Done. Took 13.52.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.727992  0.253697  0.343407  0.311433  0.309956  0.311433
+sklearn miou: {'labels_3': 0.5971581600879249}
+labels_3 : tensor([9.0572e-03, 1.2228e-01, 3.8228e-02, 1.1145e-04, 3.2514e-01, 4.7780e-04,
+        1.4495e-02, 4.6939e-02, 2.5319e-02, 3.2037e-03, 4.9435e-04, 1.4224e-01],
+       device='cuda:0')
+L_train:0.8133 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.36it/s]
+own metrics:
+                oA     mIoU        mP       mR       mF1    mcAcc
+labels_3  0.960245  0.08002  0.083333  0.08002  0.081643  0.08002
+sklearn miou: {'labels_3': 0.9235294117647059}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9602], device='cuda:0')
+L_val:0.4060
+Early stopping triggered
+
+
+experiment:
+  title_suffix: v000
+  description: baseline
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: true
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.71.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.390138  0.035868  0.049511  0.083214  0.051382  0.083214
+sklearn miou: {'labels_3': 0.25517249221074045}
+labels_3 : tensor([0.0000e+00, 4.6036e-03, 4.6676e-03, 0.0000e+00, 3.6251e-01, 0.0000e+00,
+        3.7518e-05, 7.0070e-03, 5.3794e-03, 0.0000e+00, 0.0000e+00, 5.9289e-03],
+       device='cuda:0')
+L_train:1.6788 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.55it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6820
+Epoch-001
+Sampling training dataset. Done. Took 13.69.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.382335  0.034228  0.044494  0.082941  0.048882  0.082941
+sklearn miou: {'labels_3': 0.24870658571123264}
+labels_3 : tensor([0.0000, 0.0010, 0.0037, 0.0000, 0.3650, 0.0000, 0.0000, 0.0053, 0.0047,
+        0.0000, 0.0000, 0.0026], device='cuda:0')
+L_train:1.6641 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.49it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.8545
+Epoch-002
+Sampling training dataset. Done. Took 13.75.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:46<00:00,  3.91it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.383066  0.034306  0.045891  0.082913  0.04907  0.082913
+sklearn miou: {'labels_3': 0.2490465098148156}
+labels_3 : tensor([0.0000, 0.0010, 0.0031, 0.0000, 0.3656, 0.0000, 0.0000, 0.0032, 0.0064,
+        0.0000, 0.0000, 0.0036], device='cuda:0')
+L_train:1.6573 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.57it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.7601
+Epoch-003
+Sampling training dataset. Done. Took 13.63.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.383407  0.034374  0.042601  0.082604  0.049103  0.082604
+sklearn miou: {'labels_3': 0.24950523859480966}
+labels_3 : tensor([0.0000, 0.0011, 0.0032, 0.0000, 0.3682, 0.0000, 0.0000, 0.0042, 0.0037,
+        0.0000, 0.0000, 0.0030], device='cuda:0')
+L_train:1.6695 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.57it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6565
+Epoch-004
+Sampling training dataset. Done. Took 13.67.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.98it/s]
+own metrics:
+               oA     mIoU        mP        mR       mF1     mcAcc
+labels_3  0.38447  0.03444  0.043035  0.082776  0.049211  0.082776
+sklearn miou: {'labels_3': 0.24990235416784154}
+labels_3 : tensor([0.0000, 0.0012, 0.0028, 0.0000, 0.3679, 0.0000, 0.0000, 0.0041, 0.0058,
+        0.0000, 0.0000, 0.0027], device='cuda:0')
+L_train:1.6664 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.60it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6436
+Epoch-005
+Sampling training dataset. Done. Took 13.70.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.385876  0.034226  0.041197  0.082952  0.048734  0.082952
+sklearn miou: {'labels_3': 0.25114015128554235}
+labels_3 : tensor([0.0000, 0.0012, 0.0017, 0.0000, 0.3718, 0.0000, 0.0000, 0.0034, 0.0045,
+        0.0000, 0.0000, 0.0032], device='cuda:0')
+L_train:1.6712 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.58it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6509
+Epoch-006
+Sampling training dataset. Done. Took 13.71.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.384568  0.034538  0.043602  0.082819  0.049393  0.082819
+sklearn miou: {'labels_3': 0.2499738029135712}
+labels_3 : tensor([0.0000, 0.0010, 0.0015, 0.0000, 0.3705, 0.0000, 0.0000, 0.0048, 0.0044,
+        0.0000, 0.0000, 0.0024], device='cuda:0')
+L_train:1.6700 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.51it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6375
+Epoch-007
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA     mIoU        mP        mR       mF1     mcAcc
+labels_3  0.388235  0.03416  0.042961  0.083166  0.048463  0.083166
+sklearn miou: {'labels_3': 0.2528656784607041}
+labels_3 : tensor([0.0000e+00, 3.1338e-04, 1.1939e-03, 0.0000e+00, 3.7994e-01, 0.0000e+00,
+        0.0000e+00, 3.2828e-03, 1.6839e-03, 0.0000e+00, 0.0000e+00, 1.8251e-03],
+       device='cuda:0')
+L_train:1.6741 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.50it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6532
+Epoch-008
+Sampling training dataset. Done. Took 13.91.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.389736  0.034801  0.042777  0.083205  0.049517  0.083205
+sklearn miou: {'labels_3': 0.25417389561818976}
+labels_3 : tensor([0.0000e+00, 1.5239e-03, 1.3573e-04, 0.0000e+00, 3.7712e-01, 0.0000e+00,
+        0.0000e+00, 5.5041e-03, 3.9868e-03, 0.0000e+00, 0.0000e+00, 1.4643e-03],
+       device='cuda:0')
+L_train:1.6736 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.48it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6161
+Epoch-009
+Sampling training dataset. Done. Took 13.83.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.387056  0.033905  0.042796  0.083238  0.048104  0.083238
+sklearn miou: {'labels_3': 0.2520386773848852}
+labels_3 : tensor([0.0000e+00, 1.0913e-03, 1.1586e-04, 0.0000e+00, 3.7940e-01, 0.0000e+00,
+        0.0000e+00, 2.0900e-03, 1.6408e-03, 0.0000e+00, 0.0000e+00, 2.7167e-03],
+       device='cuda:0')
+L_train:1.6820 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.51it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6816
+Epoch-010
+Sampling training dataset. Done. Took 13.77.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.388579  0.034539  0.044256  0.083157  0.049116  0.083157
+sklearn miou: {'labels_3': 0.2533611081666738}
+labels_3 : tensor([0.0000e+00, 1.4433e-03, 4.4138e-05, 0.0000e+00, 3.7821e-01, 0.0000e+00,
+        0.0000e+00, 4.6014e-03, 2.5887e-03, 0.0000e+00, 0.0000e+00, 1.6949e-03],
+       device='cuda:0')
+L_train:1.6779 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.48it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6815
+Epoch-011
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.388387  0.034564  0.043727  0.083148  0.049215  0.083148
+sklearn miou: {'labels_3': 0.2530975564377039}
+labels_3 : tensor([0.0000e+00, 1.1465e-03, 2.4938e-04, 0.0000e+00, 3.7814e-01, 0.0000e+00,
+        0.0000e+00, 3.9901e-03, 2.2345e-03, 0.0000e+00, 0.0000e+00, 2.6229e-03],
+       device='cuda:0')
+L_train:1.6730 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.56it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6690
+Epoch-012
+Sampling training dataset. Done. Took 13.63.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:45<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.389191  0.034654  0.045777  0.083269  0.04931  0.083269
+sklearn miou: {'labels_3': 0.2539307522970902}
+labels_3 : tensor([0.0000, 0.0010, 0.0013, 0.0000, 0.3781, 0.0000, 0.0000, 0.0036, 0.0030,
+        0.0000, 0.0000, 0.0023], device='cuda:0')
+L_train:1.6686 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:58<00:00, 14.51it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6665
+Epoch-013
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.387403  0.035291  0.043376  0.083144  0.050531  0.083144
+sklearn miou: {'labels_3': 0.252403721184674}
+labels_3 : tensor([0.0000, 0.0012, 0.0038, 0.0000, 0.3704, 0.0000, 0.0000, 0.0063, 0.0038,
+        0.0000, 0.0000, 0.0020], device='cuda:0')
+L_train:1.6702 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [00:57<00:00, 14.55it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:1.6688
+Early stopping triggered
+
+
+experiment:
+  title_suffix: v001
+  description: Color +-
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: true
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.60.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:41<00:00,  4.00it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.448074  0.065433  0.091609  0.116432  0.092291  0.116432
+sklearn miou: {'labels_3': 0.30218036314293034}
+labels_3 : tensor([0.0000e+00, 2.8644e-02, 6.9264e-03, 0.0000e+00, 3.2650e-01, 0.0000e+00,
+        3.3104e-06, 2.4517e-02, 5.0516e-03, 2.0129e-04, 1.1035e-06, 5.6234e-02],
+       device='cuda:0')
+L_train:1.5413 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.29it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:6.7302
+Epoch-001
+Sampling training dataset. Done. Took 13.66.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.543625  0.116257  0.161506  0.171356  0.154379  0.171356
+sklearn miou: {'labels_3': 0.39486430632767244}
+labels_3 : tensor([0.0010, 0.0687, 0.0091, 0.0000, 0.3134, 0.0000, 0.0006, 0.0215, 0.0047,
+        0.0003, 0.0000, 0.1241], device='cuda:0')
+L_train:1.2959 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.27it/s]
+own metrics:
+           oA  mIoU   mP   mR  mF1  mcAcc
+labels_3  0.0   0.0  0.0  0.0  0.0    0.0
+sklearn miou: {'labels_3': 0.0}
+labels_3 : tensor([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.], device='cuda:0')
+L_val:6.6937
+Epoch-002
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.93it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.574263  0.133273  0.186223  0.189886  0.17629  0.189886
+sklearn miou: {'labels_3': 0.42501940462807464}
+labels_3 : tensor([5.7270e-04, 7.9750e-02, 1.4513e-02, 7.7242e-06, 3.1102e-01, 0.0000e+00,
+        3.7827e-03, 2.1728e-02, 1.3110e-02, 6.3791e-04, 0.0000e+00, 1.2914e-01],
+       device='cuda:0')
+L_train:1.2155 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.31it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.289501  0.024125  0.083333  0.024125  0.037418  0.024125
+sklearn miou: {'labels_3': 0.16924910607866508}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.2895], device='cuda:0')
+L_val:1.0588
+Epoch-003
+Sampling training dataset. Done. Took 13.59.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.526854  0.105279  0.148932  0.162858  0.142715  0.162858
+sklearn miou: {'labels_3': 0.37656723025865374}
+labels_3 : tensor([1.4124e-04, 7.3914e-02, 1.7014e-02, 1.1035e-06, 3.2344e-01, 0.0000e+00,
+        3.7474e-03, 2.2364e-02, 7.8434e-03, 5.3372e-04, 2.2069e-05, 7.7838e-02],
+       device='cuda:0')
+L_train:1.3297 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.31it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.994903  0.082909  0.083333  0.082909  0.08312  0.082909
+sklearn miou: {'labels_3': 0.9898580121703854}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9949], device='cuda:0')
+L_val:0.4274
+Epoch-004
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.95it/s]
+own metrics:
+                oA     mIoU        mP        mR       mF1     mcAcc
+labels_3  0.617271  0.14943  0.200703  0.208853  0.193674  0.208853
+sklearn miou: {'labels_3': 0.4674686355006481}
+labels_3 : tensor([7.5477e-04, 9.3174e-02, 2.8005e-02, 7.7242e-06, 3.0623e-01, 0.0000e+00,
+        4.7162e-03, 2.9621e-02, 2.6994e-02, 6.1799e-04, 3.2000e-05, 1.2712e-01],
+       device='cuda:0')
+L_train:1.1164 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.30it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2897
+Epoch-005
+Sampling training dataset. Done. Took 13.60.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.646773  0.168747  0.230412  0.230239  0.217514  0.230239
+sklearn miou: {'labels_3': 0.49927820840725456}
+labels_3 : tensor([2.7741e-03, 1.0552e-01, 3.5727e-02, 4.0828e-05, 3.0112e-01, 0.0000e+00,
+        7.6812e-03, 2.8631e-02, 3.3662e-02, 8.6046e-04, 5.2966e-05, 1.3071e-01],
+       device='cuda:0')
+L_train:1.0367 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.33it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.3753
+Epoch-006
+Sampling training dataset. Done. Took 13.64.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.659887  0.178556  0.244038  0.240306  0.229134  0.240306
+sklearn miou: {'labels_3': 0.514182872122424}
+labels_3 : tensor([4.0100e-03, 1.1375e-01, 3.8640e-02, 8.9380e-05, 3.0420e-01, 0.0000e+00,
+        8.3775e-03, 2.8082e-02, 3.1776e-02, 1.0191e-03, 7.7242e-06, 1.2994e-01],
+       device='cuda:0')
+L_train:1.0000 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.28it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.3072
+Epoch-007
+Sampling training dataset. Done. Took 13.68.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.667626  0.184068  0.251326  0.245835  0.235735  0.245835
+sklearn miou: {'labels_3': 0.5223693561535364}
+labels_3 : tensor([3.8776e-03, 1.1360e-01, 3.5075e-02, 5.5173e-05, 3.0701e-01, 0.0000e+00,
+        9.1830e-03, 3.0201e-02, 3.2603e-02, 1.5648e-03, 0.0000e+00, 1.3446e-01],
+       device='cuda:0')
+L_train:0.9787 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.25it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2400
+Epoch-008
+Sampling training dataset. Done. Took 13.68.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.675715  0.192147  0.259637  0.254694  0.244752  0.254694
+sklearn miou: {'labels_3': 0.5318567953985105}
+labels_3 : tensor([4.3565e-03, 1.1430e-01, 3.8512e-02, 1.1145e-04, 3.0243e-01, 0.0000e+00,
+        9.0230e-03, 3.4441e-02, 3.2675e-02, 1.3637e-03, 0.0000e+00, 1.3850e-01],
+       device='cuda:0')
+L_train:0.9506 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.21it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2394
+Epoch-009
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.95it/s]
+own metrics:
+               oA      mIoU        mP       mR       mF1    mcAcc
+labels_3  0.67972  0.186115  0.248477  0.24739  0.236447  0.24739
+sklearn miou: {'labels_3': 0.5340545430175387}
+labels_3 : tensor([3.4737e-03, 1.1476e-01, 3.8549e-02, 3.7518e-05, 3.0269e-01, 0.0000e+00,
+        8.3267e-03, 3.8589e-02, 3.4800e-02, 8.8154e-04, 5.5173e-05, 1.3755e-01],
+       device='cuda:0')
+L_train:0.9510 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.23it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2483
+Epoch-010
+Sampling training dataset. Done. Took 13.76.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU        mP      mR       mF1   mcAcc
+labels_3  0.682519  0.187712  0.250084  0.2486  0.237002  0.2486
+sklearn miou: {'labels_3': 0.5382383646739755}
+labels_3 : tensor([3.5399e-03, 1.1633e-01, 3.9613e-02, 9.0484e-05, 3.0471e-01, 0.0000e+00,
+        8.7593e-03, 3.5398e-02, 3.4847e-02, 1.1069e-03, 7.3932e-05, 1.3805e-01],
+       device='cuda:0')
+L_train:0.9460 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.22it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.4332
+Epoch-011
+Sampling training dataset. Done. Took 13.49.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:44<00:00,  3.94it/s]
+own metrics:
+               oA      mIoU       mP        mR       mF1     mcAcc
+labels_3  0.67854  0.191388  0.25907  0.253334  0.242655  0.253334
+sklearn miou: {'labels_3': 0.5356436605672399}
+labels_3 : tensor([4.6643e-03, 1.1455e-01, 3.8340e-02, 7.9449e-05, 3.0505e-01, 0.0000e+00,
+        9.2713e-03, 3.2322e-02, 3.3785e-02, 1.2559e-03, 4.1931e-05, 1.3918e-01],
+       device='cuda:0')
+L_train:0.9474 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.30it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2325
+Epoch-012
+Sampling training dataset. Done. Took 13.66.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.95it/s]
+own metrics:
+                oA      mIoU       mP        mR       mF1     mcAcc
+labels_3  0.684124  0.194313  0.26204  0.256489  0.246426  0.256489
+sklearn miou: {'labels_3': 0.5407125807440181}
+labels_3 : tensor([4.7162e-03, 1.1528e-01, 3.8911e-02, 5.8483e-05, 3.0660e-01, 0.0000e+00,
+        8.8321e-03, 3.4972e-02, 3.4045e-02, 8.6505e-04, 2.0966e-05, 1.3983e-01],
+       device='cuda:0')
+L_train:0.9402 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:03<00:00, 13.30it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.3048
+Early stopping triggered
+
+
+experiment:
+  title_suffix: v004
+  description: Are Waveform and riegl correlated (handle the same information?)
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  - incAngles
+  - distanceFromScanner
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: false
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.51.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP       mR       mF1    mcAcc
+labels_3  0.640559  0.192395  0.250565  0.25286  0.240827  0.25286
+sklearn miou: {'labels_3': 0.5071603572912436}
+labels_3 : tensor([8.3333e-03, 1.0981e-01, 2.2530e-02, 0.0000e+00, 3.2061e-01, 3.3104e-06,
+        1.2916e-02, 3.5815e-02, 2.3946e-02, 1.6101e-03, 1.1035e-05, 1.0497e-01],
+       device='cuda:0')
+L_train:1.0358 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.14it/s]
+own metrics:
+                oA     mIoU        mP       mR       mF1    mcAcc
+labels_3  0.958206  0.07985  0.083333  0.07985  0.081555  0.07985
+sklearn miou: {'labels_3': 0.9197651663405088}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9582], device='cuda:0')
+L_val:0.5574
+Epoch-001
+Sampling training dataset. Done. Took 13.59.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.98it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.675942  0.207385  0.268705  0.268474  0.255557  0.268474
+sklearn miou: {'labels_3': 0.5414333636774252}
+labels_3 : tensor([8.0579e-03, 1.2253e-01, 2.5865e-02, 0.0000e+00, 3.2000e-01, 3.5311e-05,
+        1.3899e-02, 4.3169e-02, 1.9329e-02, 1.7390e-03, 5.5173e-06, 1.2131e-01],
+       device='cuda:0')
+L_train:0.9368 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.10it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.981651  0.081804  0.083333  0.081804  0.082562  0.081804
+sklearn miou: {'labels_3': 0.963963963963964}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9817], device='cuda:0')
+L_val:0.5516
+Epoch-002
+Sampling training dataset. Done. Took 13.67.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.698685  0.224951  0.291286  0.286914  0.275592  0.286914
+sklearn miou: {'labels_3': 0.5666345657310033}
+labels_3 : tensor([9.0208e-03, 1.2483e-01, 3.3472e-02, 0.0000e+00, 3.2066e-01, 5.9587e-05,
+        1.4552e-02, 4.0777e-02, 2.7289e-02, 2.0881e-03, 5.5173e-06, 1.2592e-01],
+       device='cuda:0')
+L_train:0.8705 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.13it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.797146  0.066429  0.083333  0.066429  0.073927  0.066429
+sklearn miou: {'labels_3': 0.6627118644067796}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.7971], device='cuda:0')
+L_val:0.6823
+Epoch-003
+Sampling training dataset. Done. Took 13.53.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.688626  0.219747  0.288957  0.279466  0.269435  0.279466
+sklearn miou: {'labels_3': 0.5559260601892393}
+labels_3 : tensor([9.4677e-03, 1.2394e-01, 3.2107e-02, 0.0000e+00, 3.1071e-01, 4.9656e-05,
+        1.3915e-02, 4.4018e-02, 2.8786e-02, 2.1374e-03, 1.7655e-05, 1.2347e-01],
+       device='cuda:0')
+L_train:0.8931 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.14it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2739
+Epoch-004
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.722932  0.250654  0.334416  0.312222  0.306081  0.312222
+sklearn miou: {'labels_3': 0.5938461872979166}
+labels_3 : tensor([1.0645e-02, 1.2467e-01, 3.3229e-02, 1.1035e-06, 3.2544e-01, 5.5173e-05,
+        1.5521e-02, 4.8389e-02, 2.5743e-02, 3.1915e-03, 1.6993e-04, 1.3588e-01],
+       device='cuda:0')
+L_train:0.8062 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.14it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.996942  0.083078  0.083333  0.083078  0.083206  0.083078
+sklearn miou: {'labels_3': 0.9939024390243902}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9969], device='cuda:0')
+L_val:0.2943
+Epoch-005
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.724974  0.248877  0.332834  0.311254  0.304044  0.311254
+sklearn miou: {'labels_3': 0.5952130950358043}
+labels_3 : tensor([1.0588e-02, 1.2630e-01, 3.9978e-02, 1.1035e-06, 3.1740e-01, 2.7587e-05,
+        1.4984e-02, 4.5159e-02, 2.7623e-02, 3.4497e-03, 1.1145e-04, 1.3935e-01],
+       device='cuda:0')
+L_train:0.7990 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.13it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.987768  0.082314  0.083333  0.082314  0.08282  0.082314
+sklearn miou: {'labels_3': 0.9758308157099698}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9878], device='cuda:0')
+L_val:0.3193
+Epoch-006
+Sampling training dataset. Done. Took 13.69.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.720126  0.246949  0.335044  0.308171  0.303299  0.308171
+sklearn miou: {'labels_3': 0.5889990082672946}
+labels_3 : tensor([1.0720e-02, 1.2307e-01, 3.6243e-02, 0.0000e+00, 3.1541e-01, 1.7655e-05,
+        1.5602e-02, 4.9594e-02, 2.9106e-02, 3.9400e-03, 9.3794e-05, 1.3634e-01],
+       device='cuda:0')
+L_train:0.8084 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.11it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.866463  0.072205  0.083333  0.072205  0.077371  0.072205
+sklearn miou: {'labels_3': 0.7643884892086331}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.8665], device='cuda:0')
+L_val:0.5776
+Epoch-007
+Sampling training dataset. Done. Took 13.66.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP       mR      mF1    mcAcc
+labels_3  0.734043  0.261389  0.347296  0.32275  0.31808  0.32275
+sklearn miou: {'labels_3': 0.6058644776544456}
+labels_3 : tensor([1.1006e-02, 1.2390e-01, 3.8643e-02, 1.6552e-05, 3.2175e-01, 8.2760e-05,
+        1.5970e-02, 5.0235e-02, 2.7250e-02, 4.1275e-03, 1.7655e-04, 1.4089e-01],
+       device='cuda:0')
+L_train:0.7775 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.11it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2423
+Epoch-008
+Sampling training dataset. Done. Took 13.59.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.749644  0.268009  0.360205  0.328385  0.325143  0.328385
+sklearn miou: {'labels_3': 0.6225653430177779}
+labels_3 : tensor([1.0238e-02, 1.2354e-01, 3.8691e-02, 2.2069e-06, 3.3133e-01, 1.3242e-04,
+        1.5832e-02, 5.1202e-02, 3.1691e-02, 4.2228e-03, 4.4800e-04, 1.4231e-01],
+       device='cuda:0')
+L_train:0.7520 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.10it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.994903  0.082909  0.083333  0.082909  0.08312  0.082909
+sklearn miou: {'labels_3': 0.9898580121703854}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9949], device='cuda:0')
+L_val:0.2527
+Epoch-009
+Sampling training dataset. Done. Took 13.54.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.744837  0.265609  0.352981  0.325105  0.321842  0.325105
+sklearn miou: {'labels_3': 0.6179250193763117}
+labels_3 : tensor([1.0350e-02, 1.2363e-01, 4.0173e-02, 7.7242e-06, 3.2889e-01, 1.5448e-05,
+        1.6088e-02, 5.2486e-02, 2.8146e-02, 4.5730e-03, 3.4097e-04, 1.4013e-01],
+       device='cuda:0')
+L_train:0.7596 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:16<00:00, 11.08it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.994903  0.082909  0.083333  0.082909  0.08312  0.082909
+sklearn miou: {'labels_3': 0.9898580121703854}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9949], device='cuda:0')
+L_val:0.2406
+Epoch-010
+Sampling training dataset. Done. Took 13.62.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP       mR       mF1    mcAcc
+labels_3  0.754207  0.276036  0.368602  0.33651  0.334478  0.33651
+sklearn miou: {'labels_3': 0.6291616878381989}
+labels_3 : tensor([1.0955e-02, 1.2407e-01, 4.1833e-02, 1.3242e-05, 3.3076e-01, 2.0414e-04,
+        1.6252e-02, 5.2689e-02, 3.2208e-02, 5.4545e-03, 4.5132e-04, 1.3931e-01],
+       device='cuda:0')
+L_train:0.7399 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:16<00:00, 11.07it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.995923  0.082994  0.083333  0.082994  0.083163  0.082994
+sklearn miou: {'labels_3': 0.9918781725888325}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9959], device='cuda:0')
+L_val:0.3196
+Epoch-011
+Sampling training dataset. Done. Took 13.57.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.740049  0.264653  0.349811  0.324549  0.320939  0.324549
+sklearn miou: {'labels_3': 0.614756362282342}
+labels_3 : tensor([1.0711e-02, 1.2454e-01, 3.9834e-02, 0.0000e+00, 3.2243e-01, 4.0828e-05,
+        1.6065e-02, 5.1591e-02, 3.1713e-02, 4.5940e-03, 4.4028e-04, 1.3809e-01],
+       device='cuda:0')
+L_train:0.7692 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.10it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.942915  0.078576  0.083333  0.078576  0.080885  0.078576
+sklearn miou: {'labels_3': 0.8919961427193829}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9429], device='cuda:0')
+L_val:0.3668
+Epoch-012
+Sampling training dataset. Done. Took 13.71.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.741871  0.264073  0.348439  0.323627  0.319422  0.323627
+sklearn miou: {'labels_3': 0.6158492244674176}
+labels_3 : tensor([1.0725e-02, 1.2382e-01, 4.2041e-02, 0.0000e+00, 3.2365e-01, 2.3173e-05,
+        1.6178e-02, 5.2918e-02, 3.1243e-02, 4.4272e-03, 3.3435e-04, 1.3651e-01],
+       device='cuda:0')
+L_train:0.7715 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.17it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.1424
+Epoch-013
+Sampling training dataset. Done. Took 13.69.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+                oA      mIoU       mP        mR       mF1     mcAcc
+labels_3  0.735986  0.260552  0.34757  0.319349  0.315913  0.319349
+sklearn miou: {'labels_3': 0.6105127559898255}
+labels_3 : tensor([1.0185e-02, 1.2361e-01, 3.9565e-02, 2.2069e-06, 3.2524e-01, 1.6442e-04,
+        1.5158e-02, 5.2167e-02, 2.8876e-02, 3.7403e-03, 4.5021e-04, 1.3683e-01],
+       device='cuda:0')
+L_train:0.7897 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.15it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.1988
+Epoch-014
+Sampling training dataset. Done. Took 13.61.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:42<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.738334  0.262567  0.353021  0.322056  0.319121  0.322056
+sklearn miou: {'labels_3': 0.6115490095574515}
+labels_3 : tensor([1.0612e-02, 1.2419e-01, 3.8205e-02, 2.2069e-06, 3.2413e-01, 2.0635e-04,
+        1.6068e-02, 5.1130e-02, 3.1050e-02, 3.4592e-03, 4.3918e-04, 1.3883e-01],
+       device='cuda:0')
+L_train:0.7827 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.15it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.987768  0.082314  0.083333  0.082314  0.08282  0.082314
+sklearn miou: {'labels_3': 0.9758308157099698}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9878], device='cuda:0')
+L_val:0.2990
+Epoch-015
+Sampling training dataset. Done. Took 13.57.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.97it/s]
+own metrics:
+                oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.748875  0.273858  0.365961  0.333314  0.331307  0.333314
+sklearn miou: {'labels_3': 0.625021590393287}
+labels_3 : tensor([1.1296e-02, 1.2476e-01, 3.6984e-02, 4.4138e-06, 3.3093e-01, 2.5600e-04,
+        1.5933e-02, 5.2779e-02, 3.2821e-02, 4.2829e-03, 5.0649e-04, 1.3833e-01],
+       device='cuda:0')
+L_train:0.7553 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.15it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.2503
+Epoch-016
+Sampling training dataset. Done. Took 13.78.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.96it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.75885  0.279072  0.376613  0.338933  0.338122  0.338933
+sklearn miou: {'labels_3': 0.6345972863599493}
+labels_3 : tensor([1.1207e-02, 1.2737e-01, 4.2464e-02, 2.2069e-06, 3.2620e-01, 4.5132e-04,
+        1.5482e-02, 5.3120e-02, 3.4491e-02, 4.7015e-03, 3.1228e-04, 1.4304e-01],
+       device='cuda:0')
+L_train:0.7225 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:15<00:00, 11.12it/s]
+own metrics:
+                oA      mIoU        mP        mR      mF1     mcAcc
+labels_3  0.994903  0.082909  0.083333  0.082909  0.08312  0.082909
+sklearn miou: {'labels_3': 0.9898580121703854}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 0.9949], device='cuda:0')
+L_val:0.2780
+Epoch-017
+Sampling training dataset. Done. Took 13.59.
+Training       : 100%|██████████████████████████████████████████████████████████████████████| 885/885 [03:43<00:00,  3.97it/s]
+own metrics:
+               oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  0.74169  0.276097  0.367879  0.335957  0.333953  0.335957
+sklearn miou: {'labels_3': 0.618448765192404}
+labels_3 : tensor([0.0112, 0.1238, 0.0389, 0.0000, 0.3284, 0.0005, 0.0161, 0.0488, 0.0308,
+        0.0051, 0.0005, 0.1375], device='cuda:0')
+L_train:0.7614 
+Validation     : 100%|██████████████████████████████████████████████████████████████████████| 843/843 [01:16<00:00, 11.08it/s]
+own metrics:
+           oA      mIoU        mP        mR       mF1     mcAcc
+labels_3  1.0  0.083333  0.083333  0.083333  0.083333  0.083333
+sklearn miou: {'labels_3': 1.0}
+labels_3 : tensor([0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+        0.0000, 0.0000, 1.0000], device='cuda:0')
+L_val:0.1998
+Early stopping triggered
+
+
+experiment:
+  title_suffix: v005
+  description: Is geometric information relevant (compare with v003 )
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  - riegl_feats
+  - geom_feats
+  - normals
+  - incAngles
+  - distanceFromScanner
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: false
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:225: RuntimeWarning: invalid value encountered in divide
+  linearity = (eigenvals[:, 0] - eigenvals[:, 1]) / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:226: RuntimeWarning: invalid value encountered in divide
+  planarity = (eigenvals[:, 1] - eigenvals[:, 2]) / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:227: RuntimeWarning: invalid value encountered in divide
+  sphericity = eigenvals[:, 2] / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:229: RuntimeWarning: invalid value encountered in divide
+  anisotropy = (eigenvals[:, 0] - eigenvals[:, 2]) / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:230: RuntimeWarning: invalid value encountered in divide
+  eigenentropy = -np.sum((eigenvals / eigenvals.sum(axis=1, keepdims=True)) *
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:231: RuntimeWarning: invalid value encountered in divide
+  np.log(eigenvals / eigenvals.sum(axis=1, keepdims=True) + 1e-10), axis=1)
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.57.
+Training       :   0%|                                                                                | 0/885 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/train.py", line 223, in <module>
+    main()
+  File "/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/train.py", line 99, in main
+    for i, batch in enumerate(tqdm(train_dl, desc=f"{'Training':<15}", leave=True)):
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1465, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1491, in _process_data
+    data.reraise()
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/_utils.py", line 715, in reraise
+    raise exception
+IndexError: Caught IndexError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/_utils/worker.py", line 351, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py", line 265, in __getitem__
+    if f in self.transforms_dict else self.projects[proj_idx][f][neibs]
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+IndexError: index 757980 is out of bounds for axis 0 with size 72328
+
+Script train.py --config ./config/batch_01/v006.yaml encountered an error (exit status 1). Moving to the next script.
+experiment:
+  title_suffix: v007
+  description: Are neibors needed? (compare with v006)
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  - riegl_feats
+  - geom_feats
+  - normals
+  - incAngles
+  - distanceFromScanner
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: false
+  ignore_neibors: true
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
+
+Loading '2024-03-22_FW_Koenigshuegel.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_02.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_03.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_04.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_05.FwfProj'; Bounding box IDs = default
+Loading '2024-05-10_FW_RWTH_Zentrum_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [0, 2]
+Loading '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Deltourserb.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_RotheErde.FwfProj'; Bounding box IDs = default
+Loading '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj'; Bounding box IDs = default
+Loading '2023-08-28_FW_EingangBauing.FwfProj'; Bounding box IDs = default
+Loading '2024-04-05_FW_Westbahnhof_01.FwfProj'; Bounding box IDs = default
+Loading '2024-07-31_FW_Bruecke_Koenigstr.FwfProj'; Bounding box IDs = [1]
+Loading '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj'; Bounding box IDs = [0]
+Loading '2024-07-31_FW_Bruecke_Turmstr.FwfProj'; Bounding box IDs = default
+Computing neibors for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox' @ k=20
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:225: RuntimeWarning: invalid value encountered in divide
+  linearity = (eigenvals[:, 0] - eigenvals[:, 1]) / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:226: RuntimeWarning: invalid value encountered in divide
+  planarity = (eigenvals[:, 1] - eigenvals[:, 2]) / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:227: RuntimeWarning: invalid value encountered in divide
+  sphericity = eigenvals[:, 2] / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:229: RuntimeWarning: invalid value encountered in divide
+  anisotropy = (eigenvals[:, 0] - eigenvals[:, 2]) / eigenvals[:, 0]
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:230: RuntimeWarning: invalid value encountered in divide
+  eigenentropy = -np.sum((eigenvals / eigenvals.sum(axis=1, keepdims=True)) *
+/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py:231: RuntimeWarning: invalid value encountered in divide
+  np.log(eigenvals / eigenvals.sum(axis=1, keepdims=True) + 1e-10), axis=1)
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2024-03-22_FW_Koenigshuegel.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_02.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_03.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_04.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_05.FwfProj::defaultBbox'
+Computing incidence angles for '2024-05-10_FW_RWTH_Zentrum_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=002'
+Computing incidence angles for '2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Deltourserb.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_RotheErde.FwfProj::defaultBbox'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Rottstrasse.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=20
+Computing normals and geom_featsfor '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=20
+Computing normals and geom_featsfor '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=20
+Computing incidence angles for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox'
+Computing incidence angles for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001'
+Computing incidence angles for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000'
+Computing incidence angles for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox'
+Computing neibors for '2023-08-28_FW_EingangBauing.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-04-05_FW_Westbahnhof_01.FwfProj::defaultBbox' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Koenigstr.FwfProj::bboxId=001' @ k=128
+Computing neibors for '2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj::bboxId=000' @ k=128
+Computing neibors for '2024-07-31_FW_Bruecke_Turmstr.FwfProj::defaultBbox' @ k=128
+Epoch-000
+Sampling training dataset. Done. Took 13.75.
+Training       :   0%|                                                                                | 0/885 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/train.py", line 223, in <module>
+    main()
+  File "/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/train.py", line 99, in main
+    for i, batch in enumerate(tqdm(train_dl, desc=f"{'Training':<15}", leave=True)):
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 701, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1465, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/dataloader.py", line 1491, in _process_data
+    data.reraise()
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/_utils.py", line 715, in reraise
+    raise exception
+IndexError: Caught IndexError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/_utils/worker.py", line 351, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/hristo/anaconda3/lib/python3.12/site-packages/torch/utils/data/_utils/fetch.py", line 52, in fetch
+    data = [self.dataset[idx] for idx in possibly_batched_index]
+            ~~~~~~~~~~~~^^^^^
+  File "/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor/data/fwf_dataset.py", line 265, in __getitem__
+    if f in self.transforms_dict else self.projects[proj_idx][f][neibs]
+                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+IndexError: index 818010 is out of bounds for axis 0 with size 72328
+
+Script train.py --config ./config/batch_01/v007.yaml encountered an error (exit status 1). Moving to the next script.
+All scripts have been executed.
+(base) hristo@hristo-north:/media/hristo/sharedData1/00_Projects/24-10-26_SPP_PCS/03_Code/fg-feat-extractor$ 
