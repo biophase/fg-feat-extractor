@@ -1,0 +1,159 @@
+experiment:
+  title_suffix: v001
+  description: Color +-
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+data:
+  dataset_root: ../../02_Datasets/FWF_Subsampled/0.01_simple/
+  split: ./config/default_split.yaml
+  preprocessing:
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise:
+          mean: 0
+          std: 0.002
+      rgb:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.02
+        TransFeatureDropout:
+          dropout_prob: 0.1
+      wfm:
+        TransSignalScaling: {}
+      normals:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+      incAngles:
+        TransGaussianNoise:
+          mean: 0
+          std: 0.05
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransGaussianNoise:
+          mean: 12.13
+          std: 12.2
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+      incAngles:
+        TransStandardize:
+          mean: 2.07
+          std: 0.38
+      distanceFromScanner:
+        TransStandardize:
+          mean: 12.13
+          std: 12.2
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  fw_input_field: true
+  label_names:
+  - labels_3
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: true
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
