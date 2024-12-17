@@ -1,5 +1,5 @@
 experiment:
-  title_suffix: v005
+  title_suffix: v006
   description: Is geometric information relevant (compare with v003 )
 general:
   device: cuda

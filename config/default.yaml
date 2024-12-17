@@ -68,6 +68,7 @@ data:
     # - 'labels_2'
     - 'labels_3'
 
+  random_ss_weights: True
   query_grid_size: 0.15
   subsample_on_gpu: True
   num_neib_normalsComputation: 20
@@ -77,6 +78,7 @@ model:
   dropout_prob: 0.3
   ignore_waveform : False
   ignore_neibors : False
+  embedding_size: 128
 testing:
   query_grid_size: 0.03
   batch_size: 1024

@@ -11,8 +11,9 @@ class FGFeatNetwork (nn.Module):
     def __init__(self,
                  cfg,
                  num_input_feats,
-                 label_structure = {'labels_0':3, 'labels_1':10, 'labels_2':12, 'labels_3':18},
+                 label_structure = None,
                  global_constraint = False,
+                 
                  ):
         super(FGFeatNetwork, self).__init__()
         
@@ -20,6 +21,9 @@ class FGFeatNetwork (nn.Module):
         self.label_structure = get_label_structure_from_file(cfg)
         self.global_constraint = cfg.model.use_global_constraint
         dropout_prob = cfg.model.dropout_prob
+        # default embedding size:
+        if 'embedding_size' not in self.cfg.model.keys():
+            self.cfg.model.embedding_size = 128
         # Pointwise feats
         self.mlp1 = nn.Sequential(
             nn.Linear(num_input_feats, 64), nn.ReLU(), nn.Dropout(p=dropout_prob),
@@ -46,13 +50,13 @@ class FGFeatNetwork (nn.Module):
         self.mlp3 = nn.Sequential(
             nn.Linear(704, 512), nn.ReLU(), nn.Dropout(p=dropout_prob),  # joined shape (point + neibors)
             nn.Linear(512, 256), nn.ReLU(), nn.Dropout(p=dropout_prob),
-            nn.Linear(256, 128), nn.ReLU(), nn.Dropout(p=dropout_prob),
+            nn.Linear(256, self.cfg.model.embedding_size), nn.ReLU(), nn.Dropout(p=dropout_prob),
         )
         
         # classifier
-        self.classifier = nn.ModuleDict({k:nn.Linear(128,v) for k,v in self.label_structure.items()})
+        self.classifier = nn.ModuleDict({k:nn.Linear(self.cfg.model.embedding_size,v) for k,v in self.label_structure.items()})
         
-    def forward(self, x):
+    def forward(self, x, return_embedding = False):
         # handles easy ignores
         if self.cfg.model.ignore_waveform:
             x['wfm_neibors'] *= 0
@@ -87,8 +91,11 @@ class FGFeatNetwork (nn.Module):
         global_feat = self.mlp3(global_feat)
         
         result = {k: self.classifier[k](global_feat) for k in self.classifier.keys()}
-        
-        
-        
+
+        if return_embedding:
+            result.update(
+                embedding = global_feat
+            )
+
         return result
 

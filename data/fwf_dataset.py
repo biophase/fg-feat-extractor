@@ -166,7 +166,7 @@ class FwfDataset(Dataset):
             self.proj_lens.append(sub['points'].shape[0])
         self.proj_lens_cumsum = np.cumsum(self.proj_lens)
 
-    def subsample_random(self, sample_ratio: float, save_inv=True):
+    def subsample_random(self, sample_ratio: float, save_inv=True, weighted=False):
 
         assert 0 < sample_ratio <= 1, "Sample ratio must be between 0 and 1."
         
@@ -174,7 +174,10 @@ class FwfDataset(Dataset):
         for i, proj in enumerate(self.projects):
             num_points = proj['xyz'].shape[0]
             sample_size = int(sample_ratio * num_points)
-            sampled_ids = np.random.choice(num_points, sample_size, replace=True)
+            if not weighted:
+                sampled_ids = np.random.choice(num_points, sample_size, replace=True)
+            else:
+                sampled_ids = np.random.choice(np.arange(num_points), sample_size, replace=True)
 
             self.projects[i].update(dict(
                 labels_sub = proj['labels'][sampled_ids],  # Subsample labels

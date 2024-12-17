@@ -165,3 +165,44 @@ class EarlyStopping:
             self.counter += 1
             if self.counter >= self.patience:
                 self.early_stop = True
+def simple_metrics(gt:np.ndarray, pr:np.ndarray, num_classes:int)->Dict:
+    """
+    gt -> ground truth (N,)
+    pr -> preds (N,)
+    returns dict with 
+        - iou (num_classes,)
+        - pc_acc (num_classes,)
+        - miou (1,) 
+        - macc (1,)
+    """
+
+    assert len(gt.shape) == 1 
+    assert len(pr.shape) == 1 
+    assert gt.shape[0] == pr.shape[0]
+
+    c = np.arange(num_classes)
+    gt_eq_c = gt[:,None] == c [None,:]
+    pr_eq_c = pr[:,None] == c [None,:]
+
+    iou = np.zeros((num_classes))
+    pc_acc = np.zeros((num_classes))
+    for ci in range(num_classes):
+        tp = (gt_eq_c[:,ci]==True) & (pr_eq_c[:,ci]==True)
+        fn = (gt_eq_c[:,ci]==True) & (pr_eq_c[:,ci]==False)
+        fp = (gt_eq_c[:,ci]==False) & (pr_eq_c[:,ci]==True)
+        tp_plus_fn = fp.sum() + fn.sum()
+        iou[ci] = tp.sum() / (tp_plus_fn + tp.sum() +1e-6)
+        pc_acc[ci] = tp.sum() / tp_plus_fn if tp_plus_fn > 0 else np.nan
+
+
+
+    # put nans if there were no gt to begin with
+    iou[gt_eq_c.sum(axis=0) == 0]=np.nan
+    miou = np.nanmean(iou)
+    macc = np.nanmean(pc_acc)
+    return dict(
+        iou = iou, 
+        pc_acc = pc_acc,
+        miou = miou,
+        macc = macc
+    )
