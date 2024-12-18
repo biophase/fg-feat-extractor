@@ -28,7 +28,7 @@ def main():
     parser.add_argument('-c','--config', default='./config/default.yaml')
     args = parser.parse_args()
 
-    # build config
+    # assemble config
     cfg = OmegaConf.load(args.config)
     cfg = OmegaConf.merge(cfg, OmegaConf.load(cfg.data.split))
     with open(os.path.join(cfg.data.dataset_root, 'class_dict.json'),'r') as f:
@@ -58,6 +58,11 @@ def main():
     val_ds.compute_incAngles()
     val_ds.compute_neibors_knn(k=cfg.data.num_neib_featureExtraction)
 
+    # load class weights
+    if cfg.data.weighted_random_subsample:
+        train_ds.load_class_weights()
+        val_ds.load_class_weights()
+
     
 
     # create model
@@ -86,7 +91,7 @@ def main():
         # subsample a random percentage of points
         start = time()
         print(f'Sampling training dataset.',end=' ')
-        train_ds.subsample_random(0.01)
+        train_ds.subsample_random(0.01,weighted=cfg.data.weighted_random_subsample)
         train_ds.compute_neibors_knn(k=cfg.data.num_neib_featureExtraction, verbose=False)
         train_dl = DataLoader(train_ds, batch_size=cfg.general.batch_size, num_workers = cfg.general.num_workers, pin_memory=True)
         print(f'Done. Took {time()-start:.2f}.')

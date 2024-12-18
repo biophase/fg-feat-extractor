@@ -1,6 +1,6 @@
 experiment:
-  title_suffix: ""
-  description: ""
+  title_suffix: "v104"
+  description: "Are Waveform and riegl correlated (handle the same information?)"
 general:
   device: 'cuda'
   batch_size : 1024
@@ -56,9 +56,6 @@ data:
   scalar_input_fields:
     - 'xyz'
     - 'rgb'
-    - 'riegl_feats'
-    - 'geom_feats'
-    - 'normals'
     - 'incAngles'
     - 'distanceFromScanner'
   fw_input_field: True
@@ -78,7 +75,6 @@ model:
   dropout_prob: 0.3
   ignore_waveform : False
   ignore_neibors : False
-  embedding_size: 128
 testing:
   query_grid_size: 0.03
   batch_size: 1024

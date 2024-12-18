@@ -1,4 +1,5 @@
 from typing import List, Optional, Dict
+from copy import deepcopy
 
 from plyfile import PlyData, PlyElement
 import pandas as pd
@@ -152,6 +153,16 @@ class FwfDataset(Dataset):
 
 
 
+    def load_class_weights(self, kind ='full'):
+        with open(os.path.join(self.cfg.data.dataset_root,'class_weights.json'),'r') as f:
+            self.statistics = json.load(f)[kind]
+            
+            self.class_weights = deepcopy(self.statistics)
+
+            for level in self.class_weights.keys():
+                counts = self.class_weights[level]
+                self.class_weights[level] = np.array([(1/(n_k+1))/sum([1/(n_j+1) for n_j in counts]) for n_k in counts])
+
     def subsample_grid(self, grid_size:float, save_inv=True):
         self.proj_lens = []
         if not grid_size: grid_size = self.cfg.data.query_grid_size
@@ -174,10 +185,20 @@ class FwfDataset(Dataset):
         for i, proj in enumerate(self.projects):
             num_points = proj['xyz'].shape[0]
             sample_size = int(sample_ratio * num_points)
-            if not weighted:
+            # assume uniform distribution for sampling
+            if not weighted: 
                 sampled_ids = np.random.choice(num_points, sample_size, replace=True)
+            # distribute inversely proportional to the class frequency
             else:
-                sampled_ids = np.random.choice(np.arange(num_points), sample_size, replace=True)
+                weights = []
+                for li, label_name in enumerate(self.cfg.data.label_names):
+                    labels = proj['labels'][:,li]
+                    weights_level = np.array(self.class_weights[label_name][labels],dtype=np.float64)
+                    weights_level /= weights_level.sum()
+                    weights.append(weights_level[:, None])
+                # average over all levels
+                weights = np.concatenate(weights,axis=-1).mean(axis=-1)
+                sampled_ids = np.random.choice(np.arange(num_points), sample_size, replace=True, p=weights)
 
             self.projects[i].update(dict(
                 labels_sub = proj['labels'][sampled_ids],  # Subsample labels
