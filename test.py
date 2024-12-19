@@ -42,11 +42,12 @@ def main():
     parser.add_argument('-v', '--voxel_size', type=float, default=0.1, help='voxel size with which to sample the point cloud')
     parser.add_argument('--return_probs', action='store_true')
     parser.add_argument('--return_embeddings', action='store_true')
+    parser.add_argument('--test_on_train', action='store_true')
 
     args = parser.parse_args()
 
 
-    output_dir = os.path.join(args.exp_dir,'test')
+    output_dir = os.path.join(args.exp_dir,'test' if not args.test_on_train else 'test_on_train')
 
     # build config
 
@@ -61,8 +62,8 @@ def main():
 
 
     report = {} # project, label_level, overall, classwise
-
-    for test_project in cfg.data._testProjects_:
+    project_names = cfg.data._testProjects_ if not args.test_on_train else cfg.data._trainProjects_
+    for test_project in project_names:
         test_ds = FwfDataset(cfg, cfg.data.preprocessing._transformsValidation_, [test_project],
                             return_resiIdx=True, return_projIdx=True)
         proj_name = test_ds.projects[0]['proj_name']
@@ -118,17 +119,17 @@ def main():
                     probs[k] = softmax(v,dim=-1)
                     preds = torch.argmax(probs[k], dim=-1)
                     all_preds[0][k][batch['residual_idx']] = preds # assume dataset has one project inside !
-
-                    all_probs[0][k][batch['residual_idx']] = probs[k]
+                    if args.return_probs:
+                        all_probs[0][k][batch['residual_idx']] = probs[k]
                     if args.return_embeddings:
                         embeddings[0][batch['residual_idx']] = out['embedding']
             # convert to numpy and upsample
             for k in cfg.data.label_names:
                 all_preds[0][k] = all_preds[0][k].cpu().detach().numpy()
                 all_preds[0][k] = all_preds[0][k][test_ds.projects[0]['sub_inv']]
-
-                all_probs[0][k] = all_probs[0][k].cpu().detach().numpy()
-                all_probs[0][k] = all_probs[0][k][test_ds.projects[0]['sub_inv']]
+                if args.return_probs:
+                    all_probs[0][k] = all_probs[0][k].cpu().detach().numpy()
+                    all_probs[0][k] = all_probs[0][k][test_ds.projects[0]['sub_inv']]
 
         
 
@@ -187,6 +188,7 @@ def main():
             report[proj_name][l] = metrics
         
         # overwrite report
+        # report_name = 'report.pkl' if not args.test_on_train else 'report_on_train.pkl'
         with open(os.path.join(output_dir,'report.pkl'),'wb') as f:
             pickle.dump(report,f)
 

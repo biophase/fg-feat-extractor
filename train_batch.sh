@@ -14,6 +14,7 @@ yaml_files=$(find $base_dir -name "*.yaml")
 
 # Loop through each YAML file found
 for yaml_file in $yaml_files; do
+    echo "Processing $yaml_file"
     # Construct the script and its arguments
     script_and_args="train.py --config $yaml_file"
     

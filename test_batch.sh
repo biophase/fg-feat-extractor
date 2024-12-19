@@ -28,6 +28,7 @@ while [[ "$#" -gt 0 ]]; do
         -v) voxel_size="$2"; shift 2;;
         --return_probs) return_probs=true; shift;;
         --return_embeddings) return_embeddings=true; shift;;
+        --test_on_train) test_on_train=true; shift;;
         -h|--help) usage;;
         *) 
             if [ -z "$exp_base_dir" ]; then
@@ -76,7 +77,9 @@ for exp_dir in $exp_dirs; do
     if [ "$return_embeddings" = true ]; then
         script_and_args="$script_and_args --return_embeddings"
     fi
-
+    if [ "$test_on_train" = true ]; then
+        script_and_args="$script_and_args --test_on_train"
+    fi
     # Debugging: print the constructed command
     echo "Executing: python $script_and_args"
 
