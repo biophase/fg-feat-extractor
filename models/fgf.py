@@ -78,8 +78,8 @@ class FGFeatNetwork (nn.Module):
         wf_feats_point = wf_feats_point.view((batch, neibor,-1))
         joined_feats_point = torch.cat([pw_feats_point, wf_feats_point], dim=-1)
         
-        # continue processing neibor feats
         
+        # continue processing neibor feats
         joined_feats_neib = self.mlp2(joined_feats_neib)
         joined_feats_neib = torch.max(joined_feats_neib, dim=1)[0]
         
