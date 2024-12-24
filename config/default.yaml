@@ -32,7 +32,7 @@ data:
         TransGaussianNoise : {mean: 0, std: 0.05}
         TransStandardize : {mean: 2.07, std: 0.38}
       distanceFromScanner:
-        TransGaussianNoise: {mean: 12.13, std: 12.20}
+        TransStandardize: {mean: 12.13, std: 12.20}
     _transformsValidation_:
       xyz:
         TransCenterXyz : {}
@@ -63,9 +63,9 @@ data:
     - 'distanceFromScanner'
   fw_input_field: True
   label_names:
-    - 'labels_0'
-    - 'labels_1'
-    - 'labels_2'
+    # - 'labels_0'
+    # - 'labels_1'
+    # - 'labels_2'
     - 'labels_3'
 
   weighted_random_subsample: True
