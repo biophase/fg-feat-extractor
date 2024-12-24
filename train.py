@@ -105,8 +105,8 @@ def main():
         print(f'Done. Took {time()-start:.2f}.')
         
         # containers
-        pred_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}.to(device=cfg.general.device)
-        gt_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}.to(device=cfg.general.device)
+        pred_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
+        gt_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
         epoch_train_loss = []
 
         model.train()
