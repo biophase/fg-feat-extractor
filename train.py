@@ -105,8 +105,8 @@ def main():
         print(f'Done. Took {time()-start:.2f}.')
         
         # containers
-        pred_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}
-        gt_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}
+        pred_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}.to(device=cfg.general.device)
+        gt_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}.to(device=cfg.general.device)
         epoch_train_loss = []
 
         model.train()
@@ -149,7 +149,7 @@ def main():
         for label_level in cfg.data.label_names:
             assert torch.all(pred_container[label_name] >= 0) # ensure that all entries in the dataset are filled
             assert torch.all(gt_container[label_name] >= 0) # ensure that all entries in the dataset are filled
-            
+            print(f'{gt_container[label_name].shape=},{pred_container[label_name].shape=}')
             miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             print(f'{label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
