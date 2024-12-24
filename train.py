@@ -147,8 +147,8 @@ def main():
         # epoch metrics
         print(f"Training. Loss{np.mean(epoch_train_loss):.4f};")
         for label_level in cfg.data.label_names:
-            assert torch.all(pred_container >= 0) # ensure that all entries in the dataset are filled
-            assert torch.all(gt_container >= 0) # ensure that all entries in the dataset are filled
+            assert torch.all(pred_container[label_name] >= 0) # ensure that all entries in the dataset are filled
+            assert torch.all(gt_container[label_name] >= 0) # ensure that all entries in the dataset are filled
             miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             print(f'{label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
