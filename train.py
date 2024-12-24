@@ -20,7 +20,8 @@ from omegaconf import OmegaConf
 
 # metrics computation alternatives
 from sklearn.metrics import jaccard_score
-from torchmetrics.segmentation import MeanIoU
+# from torchmetrics.segmentation import MeanIoU
+from torchmetrics.classification import MulticlassJaccardIndex, MulticlassAccuracy
 
 def main():
     # args
@@ -79,7 +80,14 @@ def main():
     val_dl = DataLoader(val_ds, batch_size=cfg.general.batch_size, num_workers = cfg.general.num_workers)
     early_stopping = EarlyStopping(min_delta=cfg.general.early_stopping_minDelta)
   
-
+    
+    # metrics
+    miou_metric = {label_level:MulticlassJaccardIndex(num_classes = \
+        len(cfg.data.label_schema[label_level]),average='macro').to(device=cfg.general.device)\
+             for label_level in cfg.data.label_names}
+    macc_metric = {label_level:MulticlassAccuracy(num_classes = \
+        len(cfg.data.label_schema[label_level]),average='macro').to(device=cfg.general.device)\
+             for label_level in cfg.data.label_names}
     
     # train loop
     for epoch in range(cfg.general.max_epochs):
@@ -96,12 +104,13 @@ def main():
         train_dl = DataLoader(train_ds, batch_size=cfg.general.batch_size, num_workers = cfg.general.num_workers, pin_memory=True)
         print(f'Done. Took {time()-start:.2f}.')
         
+        # containers
+        pred_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}
+        gt_container = {label_level : torch.ones(len(train_ds))*-1 for label_level in cfg.data.label_names}
         epoch_train_loss = []
-        epoch_metrics = []
-        iou_sklearn = {label_level:[] for label_level in train_ds.label_names}
-        iou_torchmetrics = {label_level:[] for label_level in train_ds.label_names}
+
         model.train()
-        for i, batch in enumerate(tqdm(train_dl, desc=f"{'Training':<15}", leave=True)):
+        for batch_i, batch in enumerate(tqdm(train_dl, desc=f"{'Training':<15}", leave=True)):
             optim.zero_grad()
             # put batch on device
             for k, v in batch.items():
@@ -123,39 +132,26 @@ def main():
 
             # aggregate values for metric calculation
             epoch_train_loss.append(loss.item())
+            preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}
+            for label_name in cfg.data.label_names:
+                # fill containers
+                pred_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = preds[label_name]
+                gt_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = gt[label_name]
+            
+            
 
-
-            # metrics
-            # own metrics
-            preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}    
-            epoch_metrics.append(get_multilevel_metrics(preds, batch, cfg))
-            # sklearn
-            for label_level in train_ds.label_names:
-                iou_sklearn[label_level].append(jaccard_score(
-                    batch[label_level].detach().cpu().numpy(),
-                    preds[label_level].detach().cpu().numpy(),average='micro'))
-            # torchmetrics
-            for label_level in train_ds.label_names:
-                miou = MeanIoU(num_classes=len(cfg.data.label_schema[label_level]),input_format='index', per_class=True).to(device=cfg.general.device)
-                iou_torchmetrics[label_level].append(miou(
-                    preds[label_level][:,None].to(dtype=torch.int64),
-                    batch[label_level][:,None].to(dtype=torch.int64)))
+            
             del batch, out
             torch.cuda.empty_cache()
-
-        # average out the epoch metrics
-        # own metrics
-        epoch_metrics = combine_metrics_list(epoch_metrics,cfg)
-        print('own metrics:')
-        print_metrics(epoch_metrics, cfg)
-        # sklearn
-        iou_sklearn = {k:np.mean(v) for k,v in iou_sklearn.items()}
-        print(f'sklearn miou: {iou_sklearn}')
-        #torchmetrics
-        iou_torchmetrics = {k:torch.cat([vv[None,:] for vv in v],dim=0).mean(dim=0) for k,v in iou_torchmetrics.items()}
-        for k,v in iou_torchmetrics.items():
-            print(f'{k} : {v}')
-        print(f"L_train:{np.mean(epoch_train_loss):.4f} ")
+        
+        # epoch metrics
+        print(f"Training. Loss{np.mean(epoch_train_loss):.4f};")
+        for label_level in cfg.data.label_names:
+            assert torch.all(pred_container >= 0) # ensure that all entries in the dataset are filled
+            assert torch.all(gt_container >= 0) # ensure that all entries in the dataset are filled
+            miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
+            macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
+            print(f'{label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
         
         # validate  
         epoch_metrics = []
@@ -164,7 +160,7 @@ def main():
         iou_torchmetrics = {label_level:[] for label_level in val_ds.label_names}
         model.eval()
         with torch.no_grad():
-            for i,batch in enumerate(tqdm(val_dl, desc=f"{'Validation':<15}", leave=True)):
+            for batch_i,batch in enumerate(tqdm(val_dl, desc=f"{'Validation':<15}", leave=True)):
                 # put batch on device
                 for k, v in batch.items():
                     batch[k] = v.to(device=cfg.general.device)
@@ -180,19 +176,22 @@ def main():
 
             # aggregate values for metric calculation
             epoch_val_loss.append(loss.item())
-            preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}    
-            epoch_metrics.append(get_multilevel_metrics(preds, batch, cfg))
-            # sklearn
-            for label_level in train_ds.label_names:
-                iou_sklearn[label_level].append(jaccard_score(
-                    batch[label_level].detach().cpu().numpy(),
-                    preds[label_level].detach().cpu().numpy(),average='micro'))
-            # torchmetrics
-            for label_level in train_ds.label_names:
-                miou = MeanIoU(num_classes=len(cfg.data.label_schema[label_level]),input_format='index', per_class=True).to(device=cfg.general.device)
-                iou_torchmetrics[label_level].append(miou(
-                    preds[label_level][:,None].to(dtype=torch.int64),
-                    batch[label_level][:,None].to(dtype=torch.int64)))
+            preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}
+            
+            
+            # OLD Metrics
+            # epoch_metrics.append(get_multilevel_metrics(preds, batch, cfg))
+            # # sklearn
+            # for label_level in train_ds.label_names:
+            #     iou_sklearn[label_level].append(jaccard_score(
+            #         batch[label_level].detach().cpu().numpy(),
+            #         preds[label_level].detach().cpu().numpy(),average='micro'))
+            # # torchmetrics
+            # for label_level in train_ds.label_names:
+            #     miou = MeanIoU(num_classes=len(cfg.data.label_schema[label_level]),input_format='index', per_class=True).to(device=cfg.general.device)
+            #     iou_torchmetrics[label_level].append(miou(
+            #         preds[label_level][:,None].to(dtype=torch.int64),
+            #         batch[label_level][:,None].to(dtype=torch.int64)))
             
             del batch, out
             torch.cuda.empty_cache()
