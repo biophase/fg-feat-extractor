@@ -89,7 +89,8 @@ def main():
         len(cfg.data.label_schema[label_level]),average='macro').to(device=cfg.general.device)\
              for label_level in cfg.data.label_names}
     
-    # train loop
+    # optimization loop
+    val_mious = [0] # exit condition
     for epoch in range(cfg.general.max_epochs):
         print(f"Epoch-{epoch:03}")
 
@@ -104,7 +105,7 @@ def main():
         train_dl = DataLoader(train_ds, batch_size=cfg.general.batch_size, num_workers = cfg.general.num_workers, pin_memory=True)
         print(f'Done. Took {time()-start:.2f}.')
         
-        # containers
+        # train containers
         pred_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
         gt_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
         epoch_train_loss = []
@@ -149,16 +150,16 @@ def main():
         for label_level in cfg.data.label_names:
             assert torch.all(pred_container[label_name] >= 0) # ensure that all entries in the dataset are filled
             assert torch.all(gt_container[label_name] >= 0) # ensure that all entries in the dataset are filled
-            print(f'{gt_container[label_name].shape=},{pred_container[label_name].shape=}')
             miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
-            print(f'{label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
+            print(f'Training. {label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
         
         # validate  
-        epoch_metrics = []
+        # val containers
         epoch_val_loss = []
-        iou_sklearn = {label_level:[] for label_level in val_ds.label_names}
-        iou_torchmetrics = {label_level:[] for label_level in val_ds.label_names}
+        pred_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
+        gt_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
+       
         model.eval()
         with torch.no_grad():
             for batch_i,batch in enumerate(tqdm(val_dl, desc=f"{'Validation':<15}", leave=True)):
@@ -178,48 +179,31 @@ def main():
             # aggregate values for metric calculation
             epoch_val_loss.append(loss.item())
             preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}
+            for label_name in cfg.data.label_names:
+                # fill containers
+                pred_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = preds[label_name]
+                gt_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = batch[label_name]
             
             
-            # OLD Metrics
-            # epoch_metrics.append(get_multilevel_metrics(preds, batch, cfg))
-            # # sklearn
-            # for label_level in train_ds.label_names:
-            #     iou_sklearn[label_level].append(jaccard_score(
-            #         batch[label_level].detach().cpu().numpy(),
-            #         preds[label_level].detach().cpu().numpy(),average='micro'))
-            # # torchmetrics
-            # for label_level in train_ds.label_names:
-            #     miou = MeanIoU(num_classes=len(cfg.data.label_schema[label_level]),input_format='index', per_class=True).to(device=cfg.general.device)
-            #     iou_torchmetrics[label_level].append(miou(
-            #         preds[label_level][:,None].to(dtype=torch.int64),
-            #         batch[label_level][:,None].to(dtype=torch.int64)))
-            
+
             del batch, out
             torch.cuda.empty_cache()
-
-                
-
-        # average out the epoch metrics
-        # own metrics
-        epoch_metrics = combine_metrics_list(epoch_metrics,cfg)
-        print('own metrics:')
-        print_metrics(epoch_metrics, cfg)
-        # sklearn
-        iou_sklearn = {k:np.mean(v) for k,v in iou_sklearn.items()}
-        print(f'sklearn miou: {iou_sklearn}')
-        #torchmetrics
-        iou_torchmetrics = {k:torch.cat([vv[None,:] for vv in v],dim=0).mean(dim=0) for k,v in iou_torchmetrics.items()}
-        for k,v in iou_torchmetrics.items():
-            print(f'{k} : {v}')
-
-        print(f"L_val:{np.mean(epoch_val_loss):.4f}")
-        early_stopping(np.mean(epoch_val_loss))
-        if early_stopping.early_stop:
-            print("Early stopping triggered")
-            break
+            
+        print(f"Validation. Loss{np.mean(epoch_val_loss):.4f};")
+        levels_average_miou = []
+        for label_level in cfg.data.label_names:
+            assert torch.all(pred_container[label_name] >= 0) # ensure that all entries in the dataset are filled
+            assert torch.all(gt_container[label_name] >= 0) # ensure that all entries in the dataset are filled
+            miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
+            macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
+            print(f'Validation. {label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
+            levels_average_miou.append(miou)
+        levels_average_miou = np.mean(levels_average_miou)
+        
         torch.save(model.state_dict(),os.path.join(exp_dir,'latest_model.pth'))
-        if early_stopping.new_best:
+        if levels_average_miou > np.max(val_mious):
             torch.save(model.state_dict(),os.path.join(exp_dir,'best_model.pth'))
+            
         
     print('\n')
 
