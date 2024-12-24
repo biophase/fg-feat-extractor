@@ -171,8 +171,8 @@ def main():
         # validate  
         # val containers
         epoch_val_loss = []
-        pred_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
-        gt_container = {label_level : torch.ones(len(train_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
+        pred_container = {label_level : torch.ones(len(val_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
+        gt_container = {label_level : torch.ones(len(val_ds)).to(device=cfg.general.device)*-1 for label_level in cfg.data.label_names}
        
         model.eval()
         with torch.no_grad():
