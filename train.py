@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader
 from torch.optim import Adam
 from torch.nn import CrossEntropyLoss
 from omegaconf import OmegaConf
+import wandb
 
 # metrics computation alternatives
 from sklearn.metrics import jaccard_score
@@ -40,6 +41,15 @@ def main():
     exp_dir = f"./exp/{generate_timestamp()}_{cfg.experiment.title_suffix}"
     os.makedirs(exp_dir,exist_ok=True)
     OmegaConf.save(cfg, f=os.path.join(exp_dir,'config.yaml'))
+    
+    # wandb
+    wandb.init(
+        project='fg-feat-extractor',
+        name=exp_dir,
+        notes=cfg.experiment.description,
+    )
+    
+    
 
 
     # initialize datasets
@@ -153,6 +163,10 @@ def main():
             miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             print(f'Training. {label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
+            wandb.log({
+                f'train-{label_level}-mIoU' : miou*100,
+                f'train-{label_level}-mAcc' : macc*100,
+            })
         
         # validate  
         # val containers
@@ -195,8 +209,12 @@ def main():
             assert torch.all(pred_container[label_name] >= 0) # ensure that all entries in the dataset are filled
             assert torch.all(gt_container[label_name] >= 0) # ensure that all entries in the dataset are filled
             miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
-            macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
+            macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()            
             print(f'Validation. {label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
+            wandb.log({
+                f'val-{label_level}-mIoU' : miou*100,
+                f'val-{label_level}-mAcc' : macc*100,
+            })
             levels_average_miou.append(miou)
         levels_average_miou = np.mean(levels_average_miou)
         

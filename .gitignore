@@ -8,6 +8,11 @@ exp/*/*.pth
 *.pth
 *.ply
 *.zip
+# wandb
+wandb/
+# Exclude the config file from being ignored
+!wandb/config.yaml  
+
 # C extensions
 *.so
 

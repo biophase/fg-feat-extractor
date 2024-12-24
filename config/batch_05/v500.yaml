@@ -1,6 +1,6 @@
 experiment:
-  title_suffix: "v507"
-  description: "Are neibors needed? (compare with v006)"
+  title_suffix: "v100"
+  description: "baseline."
 general:
   device: 'cuda'
   batch_size : 1024
@@ -32,8 +32,7 @@ data:
         TransGaussianNoise : {mean: 0, std: 0.05}
         TransStandardize : {mean: 2.07, std: 0.38}
       distanceFromScanner:
-        TransGaussianNoise : {mean: 0, std: 0.3}
-        TransStandardize: {mean: 12.13, std: 12.20}
+        TransGaussianNoise: {mean: 12.13, std: 12.20}
     _transformsValidation_:
       xyz:
         TransCenterXyz : {}
@@ -56,12 +55,6 @@ data:
   # Dataset
   scalar_input_fields:
     - 'xyz'
-    - 'rgb'
-    - 'riegl_feats'
-    - 'geom_feats'
-    - 'normals'
-    - 'incAngles'
-    - 'distanceFromScanner'
   fw_input_field: True
   label_names:
     # - 'labels_0'
@@ -77,8 +70,8 @@ data:
 model:
   use_global_constraint: False
   dropout_prob: 0.3
-  ignore_waveform : False
-  ignore_neibors : True
+  ignore_waveform : True
+  ignore_neibors : False
 testing:
   query_grid_size: 0.03
   batch_size: 1024
