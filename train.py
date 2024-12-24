@@ -136,7 +136,7 @@ def main():
             for label_name in cfg.data.label_names:
                 # fill containers
                 pred_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = preds[label_name]
-                gt_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = gt[label_name]
+                gt_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = batch[label_name]
             
             
 
