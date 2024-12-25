@@ -176,7 +176,7 @@ def main():
        
         model.eval()
         with torch.no_grad():
-            for batch_i,batch in enumerate(tqdm(val_dl, desc=f"{'Validation':<15}", leave=True)):
+            for batch_i, batch in enumerate(tqdm(val_dl, desc=f"{'Validation':<15}", leave=True)):
                 # put batch on device
                 for k, v in batch.items():
                     batch[k] = v.to(device=cfg.general.device)
@@ -190,13 +190,13 @@ def main():
                     gt = batch[k] # type:ignore
                     loss += criterion(output, gt)
 
-            # aggregate values for metric calculation
-            epoch_val_loss.append(loss.item())
-            preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}
-            for label_name in cfg.data.label_names:
-                # fill containers
-                pred_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = preds[label_name]
-                gt_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = batch[label_name]
+                # aggregate values for metric calculation
+                epoch_val_loss.append(loss.item())
+                preds = {k:torch.argmax(v,dim=1) for k,v in out.items()}
+                for label_name in cfg.data.label_names:
+                    # fill containers
+                    pred_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = preds[label_name]
+                    gt_container[label_name][batch_i * cfg.general.batch_size : (batch_i+1) * cfg.general.batch_size,...] = batch[label_name]
             
             
 
@@ -206,8 +206,10 @@ def main():
         print(f"Validation. Loss{np.mean(epoch_val_loss):.4f};")
         levels_average_miou = []
         for label_level in cfg.data.label_names:
-            assert torch.all(pred_container[label_name] >= 0) # ensure that all entries in the dataset are filled
-            assert torch.all(gt_container[label_name] >= 0) # ensure that all entries in the dataset are filled
+            # ensure that all entries in the dataset are filled
+            assert torch.all(pred_container[label_name] >= 0), f'There are {torch.sum(pred_container == -1)} entries, in PRED which are still not filled'
+            assert torch.all(gt_container[label_name] >= 0), f'There are {torch.sum(gt_container == -1)} entries, in GT which are still not filled'
+            
             miou = miou_metric[label_level](gt_container[label_name], pred_container[label_name]).item()
             macc = macc_metric[label_level](gt_container[label_name], pred_container[label_name]).item()            
             print(f'Validation. {label_level}-> mIoU: {miou*100:.2f}; mAcc: {macc*100:.2f}')
