@@ -1,5 +1,5 @@
 experiment:
-  title_suffix: "v100"
+  title_suffix: "v500"
   description: "baseline."
 general:
   device: 'cuda'

@@ -1,5 +1,5 @@
 experiment:
-  title_suffix: "v105"
+  title_suffix: "v505"
   description: "Is scan position information relevant for waveform?  (compare with v004)"
 general:
   device: 'cuda'

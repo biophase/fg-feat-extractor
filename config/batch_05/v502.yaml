@@ -1,5 +1,5 @@
 experiment:
-  title_suffix: "v102"
+  title_suffix: "v502"
   description: "Riegl +-"
 general:
   device: 'cuda'

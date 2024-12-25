@@ -1,5 +1,5 @@
 experiment:
-  title_suffix: "v101"
+  title_suffix: "v501"
   description: "Color +-"
 general:
   device: 'cuda'
