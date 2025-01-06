@@ -44,7 +44,7 @@ def main():
     
     # wandb
     wandb.init(
-        project='fg-feat-extractor',
+        project='fg-feat-extractor_run_03',
         name=exp_dir,
         notes=cfg.experiment.description,
     )
