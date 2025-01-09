@@ -28,6 +28,7 @@ def main():
     # args
     parser = ArgumentParser()
     parser.add_argument('-c','--config', default='./config/default.yaml')
+    parser.add_argument('--wandb_name', default='fg-feat-extractor')
     args = parser.parse_args()
 
     # assemble config
@@ -44,9 +45,10 @@ def main():
     
     # wandb
     wandb.init(
-        project='fg-feat-extractor_run_03',
-        name=exp_dir,
-        notes=cfg.experiment.description,
+        # project='fg-feat-extractor_run_5b-00',
+        project = args.wandb_name,
+        name = exp_dir,
+        notes = cfg.experiment.description,
     )
     
     
