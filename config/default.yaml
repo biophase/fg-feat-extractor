@@ -10,8 +10,8 @@ general:
   num_workers: 4
   root: "." # root folder of the project. Can be overwritten in notebooks to point to ROOT from root.py
 data:
-  # dataset_root : "D:\\Projekte\\GIA_220412_PCS\\02_Datasets\\FullWaveForm\\full_waveform_software\\FullWaveformParse_mass\\output\\FWF_Subsampled\\0.01_simple" # work pc
-  dataset_root : "${general.root}/../../02_Datasets/FWF_Subsampled/0.01_simple/" # home pc
+  dataset_root : "D:\\Projekte\\GIA_220412_PCS\\02_Datasets\\FullWaveForm\\full_waveform_software\\FullWaveformParse_mass\\output\\FWF_Subsampled\\0.01_simple" # work pc
+  # dataset_root : "${general.root}/../../02_Datasets/FWF_Subsampled/0.01_simple/" # home pc
   split: "${general.root}/config/default_split.yaml"
   preprocessing:
     # Transforms
