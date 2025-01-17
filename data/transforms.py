@@ -53,7 +53,7 @@ class TransScaling(Transform):
         scale_matrix = np.diag([scale_factor, scale_factor, scale_factor])  # Uniform scaling
         return x @ scale_matrix
     
-    def __init__(self, limits: Tuple = (0.85, 1.15)):
+    def __init__(self, limits: Tuple = (0.95, 1.05)):
         self.limits = limits
         
         super().__init__(self.fn)
@@ -103,7 +103,15 @@ class TransStandardize(Transform):
         x /= self.std
         return x
     def __init__(self, mean, std):
-        self.mean, self.std = mean, std
+        self.mean, self.std = np.array(mean), np.array(std)
+        super().__init__(self.fn)
+
+class TransDropColumn(Transform):
+    def fn(self, x:np.ndarray):
+        x = np.delete(x, self.column_index, axis=1)
+        return x
+    def __init__(self, column_index):
+        self.column_index=column_index
         super().__init__(self.fn)
 
 class TransformsList():

@@ -90,13 +90,13 @@ class FwfDataset(Dataset):
             
             # normalize the data
             # FIXME: Statistics calculated on first point cloud only
-            wfm = (wfm.astype(np.float32) - 358.35934) / 623.0141 # - mean / std
+            # wfm = (wfm.astype(np.float32) - 358.35934) / 623.0141 # - mean / std
 
-            riegl_feats -= np.array([[-6.90191949, 25.16398933, 26.45952891,  1.        ,  1.03636612]]) # - means
-            riegl_feats /= np.array([[  2.32590898, 2.98518547, 929.71399545, 1., 0.22651793]]) # /std
+            # riegl_feats -= np.array([[-6.90191949, 25.16398933, 26.45952891,  1.        ,  1.03636612]]) # - means
+            # riegl_feats /= np.array([[  2.32590898, 2.98518547, 929.71399545, 1., 0.22651793]]) # /std
             
-            rgb -= np.array([[0.29689665, 0.3428666,  0.190237]]) # means
-            rgb /= np.array([[0.21558372, 0.23351644, 0.21213871]]) # std          
+            # rgb -= np.array([[0.29689665, 0.3428666,  0.190237]]) # means
+            # rgb /= np.array([[0.21558372, 0.23351644, 0.21213871]]) # std          
             
 
             

@@ -1,0 +1,176 @@
+experiment:
+  title_suffix: v506
+  description: Is geometric information relevant (compare with v003 )
+general:
+  device: cuda
+  batch_size: 1024
+  weight_decay: 0.0005
+  max_epochs: 25
+  early_stopping_minDelta: 0.01
+  num_workers: 4
+  root: '.'
+data:
+  dataset_root : "${general.root}/../../02_Datasets/FWF_Subsampled/0.01_simple/" # home pc
+  split: "${general.root}/config/default_split.yaml"
+  preprocessing:
+    # Training transforms
+    _transformsTraining_:
+      xyz:
+        TransCenterXyz: {}
+        TransStandardize: {mean:[[0.,0.,0.]], std:[[0.16520438, 0.16500595, 0.13488290]]}
+        TransZRotation: {}
+        TransScaling: {}
+        TransGaussianNoise : {}
+      rgb:
+        TransStandardize: {mean:[[0.410554, 0.439411, 0.345924]], std:[[0.2817550,0.2817538,0.2855940]]}
+        TransGaussianNoise : {}
+      riegl_feats:
+        TransDropColumn: {column_index: 3}
+        TransStandardize: {mean:[[-8.669701, 23.327566, 151.619644, 1.153099]], std:[[4.10935,5.00799,3047.39721,0.42494]]}
+        TransGaussianNoise : {}
+      geom_feats:
+        TransStandardize: {mean:[[0.3780694,0.5266850,0.0952446,0.0012432,0.9047545,0.7732473]], std:[[0.20421646,0.25163340,0.12883001,0.00969308,0.12883275,0.14067655]]}
+        TransGaussianNoise : {}
+      normals:
+        TransStandardize: {mean:[[0.2526888, 0.0181013, 0.0857755]], std:[[0.4752414,0.5395823,0.6414515]]}
+        TransGaussianNoise : {}
+      incAngles:
+        TransStandardize: {mean: 2.1606705, std: 0.370573014}
+        TransGaussianNoise : {}
+      distanceFromScanner:
+        TransStandardize: {mean: 15.88863277, std: 10.879623413}
+        TransGaussianNoise : {}
+      wfm:
+        TransStandardize: {mean: 337.06781006, std: 587.10882568}
+        TransGaussianNoise : {}
+    
+    # Validation transforms (same but no agumentations)
+    _transformsValidation_:
+      xyz:
+        TransCenterXyz: {}
+        TransStandardize: {mean:[[0.,0.,0.]], std:[[0.16520438, 0.16500595, 0.13488290]]}
+      rgb:
+        TransStandardize: {mean:[[0.410554, 0.439411, 0.345924]], std:[[0.2817550,0.2817538,0.2855940]]}
+      riegl_feats:
+        TransDropColumn: {column_index: 3}
+        TransStandardize: {mean:[[-8.669701, 23.327566, 151.619644, 1.153099]], std:[[4.10935,5.00799,3047.39721,0.42494]]}
+      geom_feats:
+        TransStandardize: {mean:[[0.3780694,0.5266850,0.0952446,0.0012432,0.9047545,0.7732473]], std:[[0.20421646,0.25163340,0.12883001,0.00969308,0.12883275,0.14067655]]}
+      normals:
+        TransStandardize: {mean:[[0.2526888, 0.0181013, 0.0857755]], std:[[0.4752414,0.5395823,0.6414515]]}
+      incAngles:
+        TransStandardize: {mean: 2.1606705, std: 0.370573014}
+      distanceFromScanner:
+        TransStandardize: {mean: 15.88863277, std: 10.879623413}
+      wfm:
+        TransStandardize: {mean: 337.06781006, std: 587.10882568}
+
+    subsampling: null
+  scalar_input_fields:
+  - xyz
+  - rgb
+  - riegl_feats
+  - geom_feats
+  - normals
+  - incAngles
+  - distanceFromScanner
+  fw_input_field: true
+  label_names:
+  - labels_3
+  weighted_random_subsample: true
+  query_grid_size: 0.15
+  subsample_on_gpu: true
+  num_neib_normalsComputation: 20
+  num_neib_featureExtraction: 128
+  _trainProjects_:
+  - proj_name: 2024-03-22_FW_Koenigshuegel.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_02.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_03.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_04.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_05.FwfProj
+  - proj_name: 2024-05-10_FW_RWTH_Zentrum_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 0
+    - 2
+  - proj_name: 2024-08-02_FW_Bruecke_A44_VerlautenheidenerStr.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Deltourserb.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_RotheErde.FwfProj
+  - proj_name: 2024-08-02_FW_Bruecke_Rottstrasse.FwfProj
+  _valProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  _testProjects_:
+  - proj_name: 2023-08-28_FW_EingangBauing.FwfProj
+  - proj_name: 2024-04-05_FW_Westbahnhof_01.FwfProj
+  - proj_name: 2024-07-31_FW_Bruecke_Koenigstr.FwfProj
+    bboxes:
+    - 1
+  - proj_name: 2024-08-02_FW_Bruecke_Kasinostrasse.FwfProj
+    bboxes:
+    - 0
+  - proj_name: 2024-07-31_FW_Bruecke_Turmstr.FwfProj
+  label_schema:
+    labels_0:
+      manMade: 0
+      natural: 1
+      scanArtefact: 2
+    labels_1:
+      _unspecified: 0
+      building: 1
+      movingObject: 2
+      naturalGround: 3
+      sealedSurface: 4
+      streetFurniture: 5
+      vegetation: 6
+      vehicle: 7
+    labels_2:
+      _unspecified: 0
+      bicycle: 1
+      car: 2
+      electricalAppliance: 3
+      facadeSurface: 4
+      fence: 5
+      frameElement: 6
+      kerbStone: 7
+      naturalGround: 8
+      nonTiledPaving: 9
+      pipeLike: 10
+      scooter: 11
+      shaft: 12
+      sign: 13
+      stair: 14
+      tiledPaving: 15
+      trashCan: 16
+      vegetation: 17
+    labels_3:
+      _unspecified: 0
+      asphalt: 1
+      brick: 2
+      cable: 3
+      concrete: 4
+      marking: 5
+      mesh: 6
+      metal: 7
+      naturalStone: 8
+      poster: 9
+      treeTrunk: 10
+      vegetation: 11
+model:
+  use_global_constraint: false
+  dropout_prob: 0.3
+  ignore_waveform: false
+  ignore_neibors: false
+testing:
+  query_grid_size: 0.03
+  batch_size: 1024
